@@ -1,0 +1,18 @@
+#map-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background-image: url('#'); /* Map image */
+    background-size: cover;
+}
+.lot {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 255, 0, 0.5); /* Highlight color */
+    cursor: pointer;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
