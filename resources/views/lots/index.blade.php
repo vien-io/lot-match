@@ -16,8 +16,8 @@
 </ul>
 
 <div id="map-container">
-    <div class="lot" data-lot-id="1" style="top: 50px; left: 100px;">Lot 1</div>
-    <div class="lot" data-lot-id="2" style="top: 100px; left: 200px;">Lot 2</div>
+    <div class="lot" data-lot-id="1" style="top: 90px; left: 145px;">Lot 1</div>
+    <div class="lot" data-lot-id="2" style="top: 185px; left: 190px;">Lot 2</div>
     <!-- Add more lots -->
 </div>
 

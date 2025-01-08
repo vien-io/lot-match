@@ -2,7 +2,7 @@
     position: relative;
     width: 800px;
     height: 600px;
-    background-image: url('#'); /* Map image */
+    background-image: url('maap.jpg'); /* Map image */
     background-size: cover;
 }
 .lot {
