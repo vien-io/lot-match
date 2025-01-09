@@ -1,18 +1,26 @@
+#map-pos {
+    position: absolute;
+    top: 130px;
+    left: 100px;
+}
 #map-container {
     position: relative;
-    width: 800px;
-    height: 600px;
-    background-image: url('maap.jpg'); /* Map image */
+    width: 1200px;
+    height: 826px;
+    background-image: url('map.jpg'); 
     background-size: cover;
 }
+
 .lot {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 255, 0, 0.5); /* Highlight color */
     cursor: pointer;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: transform 0.2s ease, fill 0.2s ease;
 }
+
+.lot:hover {
+    fill: rgba(255, 255, 255, 0.5);
+    stroke: #ffffff;
+    stroke-width: 2;
+    transform: scale(1.009);
+}
+
+

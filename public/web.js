@@ -1,9 +1,8 @@
-document.querySelectorAll('.lot').forEach((lot) => {
-    lot.addEventListener('click', (event) => {
+document.getElementById('map-container').addEventListener('click', (event) => {
+    if (event.target.classList.contains('lot')) {
         const lotId = event.target.dataset.lotId;
         alert(`You clicked on Lot ${lotId}`);
-        // Later, fetch and display lot details in a modal or new page
-    });
+    }
 });
 
 
