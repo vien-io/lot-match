@@ -16,7 +16,11 @@ class CreateLotsTable extends Migration
             $table->text('description');
             $table->float('size');
             $table->decimal('price', 10, 2);
+            $table->unsignedBigInteger('block_id'); // Add block_id column
             $table->timestamps();
+
+            // Foreign key to blocks
+            $table->foreign('block_id')->references('id')->on('blocks')->onDelete('cascade');
         });
     }
 
@@ -25,4 +29,3 @@ class CreateLotsTable extends Migration
         Schema::dropIfExists('lots');
     }
 }
-
