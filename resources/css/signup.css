@@ -28,6 +28,7 @@ body {
 /* heading */
 .create-container h2 {
     margin-bottom: 32px;
+    font-size: 1.4rem;
 }
 
 /* input group */
@@ -83,10 +84,29 @@ p a:hover {
 
 .conditions {
     display: flex;
-    justify-content: left;
-    align-items: center;
+}
+
+.conditions p{
+    font-size: 9px; 
+    margin-left: 4px;
+    color: #5d5d5d;
+}
+.conditions input {
+    transform: translateY(3px);
 }
 
 p input {
     margin-right: 10px;
+}
+
+#hero {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    background-image: url('/public/images/subd.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
 }

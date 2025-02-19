@@ -1,0 +1,86 @@
+/* default style  */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* center  */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* container  */
+.signin-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 13px;
+    box-shadow: -5px 5px 10px rgb(0, 0, 0, 0.1);
+    text-align: center;
+    width: 370px;
+}
+
+/* heading  */
+.signin-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 32px;
+}
+
+
+/* input group */
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 0px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+/* button  */
+button {
+    margin-top: 31px;
+    width: 45%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(42, 115, 115);
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    cursor: pointer;
+
+}
+
+button:hover {
+    background-color: rgb(34, 69, 69);
+}
+
+.alink{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 21px;
+}
+
+.alink a{
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.alink a:hover{
+    text-decoration: underline;
+}

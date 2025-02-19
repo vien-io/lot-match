@@ -16,7 +16,12 @@ Route::get('/3dmap', function(){
     return view('3dmap');
 });
 
-// route to home page
-Route::get('/home', function () {
-    return view('home');
+// route to signup
+Route::get('/signup', function () {
+    return view('signup');
+});
+
+// route to signin
+Route::get('/signin', function() {
+    return view('signin');
 });
