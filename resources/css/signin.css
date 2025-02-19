@@ -69,6 +69,7 @@ button:hover {
     background-color: rgb(34, 69, 69);
 }
 
+/* link  */
 .alink{
     display: flex;
     justify-content: space-between;
@@ -80,7 +81,6 @@ button:hover {
     font-size: 0.75rem;
     text-decoration: none;
 }
-
 .alink a:hover{
     text-decoration: underline;
 }
