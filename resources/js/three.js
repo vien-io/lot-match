@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls} from 'three/examples/jsm/Addons.js';
+import * as dat from 'dat.gui';
 
 function initThreeJS() {
     // scene
@@ -43,6 +44,30 @@ function initThreeJS() {
     const box2 = new THREE.Mesh(box2geo, box2material);
     scene.add(box2);
     box2.position.set(0, 4, 0);
+
+    const sphereGeometry = new THREE.SphereGeometry(4, 12, 12);
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0x0000FF,
+        wireframe: false
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(sphere);
+    sphere.position.set(4, 4, 0);
+
+    const gui = new dat.GUI();
+    const options = {
+        sphereColor: '#ffea00',
+        wireframe: false
+    };
+
+    gui.addColor(options, 'sphereColor').onChange(function(e){
+        sphere.material.color.set(e);
+    });
+
+    gui.add(options, 'wireframe').onChange(function(e){
+        sphere.material.wireframe = e;
+    });
+           
 
     const planeGeometry = new THREE.PlaneGeometry(3, 3);
     const planeMaterial = new THREE.MeshBasicMaterial({
