@@ -9,21 +9,35 @@
 <body>
     <div class="signin-container">
         <h2>Sign In</h2>
-        <form action="#" method="POST">
+        <form action="{{ route('signin') }}" method="POST">
+            @csrf
             <div class="input-group">
                 <label for="name"></label>
-                <input type="text" id="name" name="name" placeholder="Your Name">
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
             </div>
             <div class="input-group">
                 <label for="passoword"></label>
-                <input type="password" id="password" name="password" placeholder="Your Password">
+                <input type="password" id="password" name="password" placeholder="Your Password" required>
             </div>
             <button type="submit">Sign In</button>
             <div class="alink">
-                <a href="#">Don't have an Account?</a> 
+                <a href="{{ route('signup') }}">Don't have an Account?</a> 
                 <a href="#">Forgot Password?</a>
             </div>
         </form>
+        @if (session('error'))
+            <div class="error-message">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="error-message">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
     </div>
 </body>
 </html>

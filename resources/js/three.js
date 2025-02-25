@@ -27,8 +27,15 @@ function initThreeJS() {
         0.1,
         1000,
     );
-    camera.position.set(5, 5, 5);
+    camera.position.set(0 , 30, 0);
     camera.lookAt(0, 0, 0);
+
+
+    // helpers
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+    const gridHelper = new THREE.GridHelper(30, 30);
+    scene.add(gridHelper);
 
     // renderer
     const renderer = new THREE.WebGLRenderer();
@@ -36,13 +43,7 @@ function initThreeJS() {
     document.body.appendChild(renderer.domElement);
     // renderer.shadowMap.enabled = false; // pang alis ng shadows to optimize
 
-    const boxGeometry = new THREE.BoxGeometry();
-    const boxMaterial = new THREE.MeshStandardMaterial({
-        color: 0x128080,
-        wireframe: false
-    });
-    const box = new THREE.Mesh(boxGeometry, boxMaterial);
-    scene.add(box); 
+    
 
     // controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -72,9 +73,10 @@ function initThreeJS() {
     // house models
     const selectableObjects = [];
     let model = null;
+    let model2 = null;
 
     const loader = new GLTFLoader();
-    loader.load('/sample2.glb', function (gltf) {
+    loader.load('/models/sample4.glb', function (gltf) {
         model = gltf.scene;
         model.position.set(0, 1, 3);
         model.scale.set(1, 1, 1);
@@ -104,6 +106,8 @@ function initThreeJS() {
     },  undefined, function (error) {
         console.error('Error loading model:', error);
     });
+
+    
 
     /* 
     // composer for post-processing
@@ -154,22 +158,26 @@ function initThreeJS() {
 
 
 
-   /* // raycaster for mouse interaction
+
+
+
+
+// for highlighting selected objs
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject = null;
-let originalMaterial = null; // Store the original material for reset
+let originalMaterial = null; // to store orig mat
 
-// highlight effect using MeshBasicMaterial for highlighting
+// emissive mat
 window.addEventListener("mousemove", (event) => {
-    // Ensure model is loaded and valid before using it
     if (!model) return;
 
+    // updt mouse
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const clickableObjects = model ? model.children : [];  // Ensure model is loaded before accessing children
+    const clickableObjects = model ? model.children : []; // make sure model is loaded
     const intersects = raycaster.intersectObjects(clickableObjects, true);
 
     if (intersects.length > 0) {
@@ -177,72 +185,57 @@ window.addEventListener("mousemove", (event) => {
 
         if (hoveredObject !== selectedObject) {
             if (selectedObject) {
-                selectedObject.material = originalMaterial; // Reset previous material
+                // reset prev obj mat to orig (not emissive)
+                if (Array.isArray(selectedObject.material)) {
+                    selectedObject.material.forEach(mat => {
+                        mat.emissive.set(0x000000);  // reset em color
+                        mat.emissiveIntensity = 0; // remove intensity
+                    });
+                } else {
+                    selectedObject.material.emissive.set(0x000000);
+                    selectedObject.material.emissiveIntensity = 0;
+                }
             }
 
             selectedObject = hoveredObject;
-            originalMaterial = selectedObject.material; // Store the original material
+            originalMaterial = selectedObject.material; // store orig mat
 
-            // Set highlighted material (MeshBasicMaterial)
-            selectedObject.material = new THREE.MeshBasicMaterial({
-                color: 0xffff00, // Yellow highlight
-                wireframe: selectedObject.material.wireframe // Keep wireframe if originally set
-            });
+            // apply em to hovered objs (for all materials)
+            if (Array.isArray(selectedObject.material)) {
+                selectedObject.material.forEach(mat => {
+                    mat.emissive.set(0xffff00); // yellow glow
+                    mat.emissiveIntensity = 1; 
+
+                    // to make sure texture is not affected by em color
+                    mat.emissiveMap = mat.map;  // diffuse map as the emissive map
+                    mat.emissive = new THREE.Color(0xffff00); // making sure emissive color is applied
+                });
+            } else {
+                selectedObject.material.emissive.set(0xffff00); // yellow glow
+                selectedObject.material.emissiveIntensity = 4;
+                selectedObject.material.emissiveMap = selectedObject.material.map; // diffuse map as em map
+                selectedObject.material.emissive = new THREE.Color(0xffff00); // apply em color
+            }
         }
     } else {
         if (selectedObject) {
-            selectedObject.material = originalMaterial; // Reset material when no object is hovered
+            // reset em color when no obj is hovered
+            if (Array.isArray(selectedObject.material)) {
+                selectedObject.material.forEach(mat => {
+                    mat.emissive.set(0x000000);
+                    mat.emissiveIntensity = 0;
+                });
+            } else {
+                // selectedObject.material.emissive.set(0x000000);
+                selectedObject.material.emissive.set(0xffffff);
+                selectedObject.material.emissiveIntensity = 0;
+            }
             selectedObject = null;
         }
     }
 });
- */
 
 
-
-
-// Raycaster for highlighting
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let selectedObject = null;
-let originalMaterial = null; // To store the original material
-
-// highlight effect using Emissive Material
-window.addEventListener("mousemove", (event) => {
-    if (!model) return;
-
-    // Update mouse position
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const clickableObjects = model ? model.children : []; // Ensure model is loaded
-    const intersects = raycaster.intersectObjects(clickableObjects, true);
-
-    if (intersects.length > 0) {
-        const hoveredObject = intersects[0].object;
-
-        if (hoveredObject !== selectedObject) {
-            if (selectedObject) {
-                // Reset previous object material to original (non-emissive)
-                selectedObject.material.emissive.set(0x000000); // Reset emissive color
-            }
-
-            selectedObject = hoveredObject;
-            originalMaterial = selectedObject.material; // Store the original material
-
-            // Set the emissive color for the highlighted object
-            selectedObject.material.emissive.set(0xffff00); // Yellow glow effect
-            selectedObject.material.emissiveIntensity = 1; // Make the glow more intense
-        }
-    } else {
-        if (selectedObject) {
-            // Reset emissive color when no object is hovered
-            selectedObject.material.emissive.set(0x000000);
-            selectedObject = null;
-        }
-    }
-});
 
 
 

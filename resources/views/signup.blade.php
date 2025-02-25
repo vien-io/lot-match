@@ -11,6 +11,7 @@
     <div class="create-container">
         <h2>Create Account</h2>
         <form action="#" method="POST">
+            @csrf
             <div class="input-group">
                 <label for="name"></label>
                 <input type="text" id="name" name="name" placeholder="Your Name">
@@ -25,7 +26,7 @@
             </div>
             <div class="input-group">
                 <label for="password"></label>
-                <input type="password" id="password" name="password" placeholder="Confirm Password">
+                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password">
             </div>
             <div class="conditions">
                 <input type="checkbox">

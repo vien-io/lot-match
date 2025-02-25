@@ -83,3 +83,31 @@ button:hover {
 .alink a:hover{
     text-decoration: underline;
 }
+
+
+
+/* error message  */
+.error-message {
+    background-color: #ffdddd;
+    color: #d8000c;
+    border-left: 4px solid #d8000c;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+
+
+
+/* 
+.error-message {
+    background-color: #ffdddd; 
+    color: #d8000c; 
+    border-left: 4px solid #d8000c;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 14px;
+}
+ */
