@@ -36,9 +36,20 @@ class LoginController extends Controller
      *
      * @return void
      */
+
+
+     public function showLoginForm()
+     {
+        return view('signin');
+     }
+
+
+
+
+
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        // $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
     }
 

@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LotController;  // import lot controller
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+
+Auth::routes(['verify' => true]); // enable pass reset route
 
 
 
@@ -21,21 +26,26 @@ Route::get('/3dmap', function(){
     return view('3dmap');
 });
 
-/* // route to signup
-Route::get('/signup', function () {
-    return view('signup');
-}); */
+// password reset route
+Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 
-// route to signin
-Route::get('/signin', function() {
-    return view('signin');
-});
 
+
+// to signin page (already have an account?)
+Route::get('/signin', [LoginController::class, 'showLoginForm'])->name('login');
+
+// signin
 Route::post('/signin', [AuthController::class, 'signin'])->name('signin');
 Auth::routes();
 
-// signup
-Route::get('/signup', [RegisterController::class, 'showRegistrationForm'])->name('signup');
-// Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+// to signup page (dont have an account?)
+Route::get('/signup', [RegisterController::class, 'showRegistrationForm'])->name('register');
+
+// signup (form submission)
+Route::post('/signup', [RegisterController::class, 'register'])->name('signup');
+
+
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

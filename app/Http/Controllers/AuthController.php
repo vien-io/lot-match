@@ -18,7 +18,7 @@ class AuthController extends Controller
             return redirect()->intended('/3dmap');
         }
         return back()->withErrors([
-            'error' => 'You have entered invalid Name or Password. Try again.'
+            'error' => 'You have entered an invalid name or password. Try again.'
         ]);
     }
 }

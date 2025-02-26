@@ -10,30 +10,37 @@
     <!-- <div id="hero"></div> -->
     <div class="create-container">
         <h2>Create Account</h2>
-        <form action="#" method="POST">
+        <form action="{{ route('signup') }}" method="POST">
             @csrf
             <div class="input-group">
                 <label for="name"></label>
-                <input type="text" id="name" name="name" placeholder="Your Name">
+                <input type="text" id="name" name="name" placeholder="Your Name" require>
             </div>
             <div class="input-group">
                 <label for="email"></label>
-                <input type="email" id="email" name="email" placeholder="Your Email">
+                <input type="email" id="email" name="email" placeholder="Your Email" require>
             </div>
             <div class="input-group">
                 <label for="password"></label>
-                <input type="password" id="password" name="password" placeholder="Password">
+                <input type="password" id="password" name="password" placeholder="Password" require>
             </div>
             <div class="input-group">
                 <label for="password"></label>
-                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password">
+                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password" require>
             </div>
             <div class="conditions">
-                <input type="checkbox">
+                <input type="checkbox" id="agreeTerms">
                 <p>By signing up, you agree to our <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a></p>
             </div>
-            <button type="submit">Sign up</button>
-            <p>Already have an account? <a href="#">Sign in</a></p>
+            @if ($errors->any())
+                <div class="error-message">
+                    @foreach($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+            <button type="submit" id="signupBtn" disabled>Sign up</button>
+            <p>Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
         </form>
     </div>
 </body>
