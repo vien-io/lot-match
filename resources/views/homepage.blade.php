@@ -11,7 +11,7 @@
             <a href="{{ route('login') }}" class="btn btn-outline-secondary">Sign In</a>
             <a href="{{ route('register') }}" class="btn btn-outline-secondary">Sign Up</a>
             --}}
-            <a href="#" class="btn btn-primary">Explore</a>
+            <a href="{{ route('explore') }}" class="btn btn-primary">Explore</a>
             <!-- <a href="#" class="btn btn-outline-secondary">Sign In</a>
             <a href="#" class="btn btn-outline-secondary">Sign Up</a> -->
         </div>
@@ -80,5 +80,15 @@
         <span>- Happy Customer</span>
     </div>
 </div>
+
+
+<!-- Parallax Section -->
+<div class="parallax-section">
+    <div class="parallax-text">
+        <h2>Discover Your Perfect Property</h2>
+        <p>Explore the best lots with breathtaking views and top-tier locations.</p>
+    </div>
+</div>
+
 
 @endsection

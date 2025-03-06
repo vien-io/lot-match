@@ -21,7 +21,7 @@
     <nav class="navbar navbar-expand-md custom-navbar">
     <div class="container">
         <!-- Brand Logo -->
-        <a class="navbar-brand" href="{{ url('/') }}">
+        <a class="navbar-brand" href="{{ url('/homepage') }}">
             LotMatch
         </a>
 
@@ -38,7 +38,7 @@
                     <!-- <a class="nav-link" href="#">Explore</a> -->
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Properties</a>
+                    <a class="nav-link" href="{{ route('properties') }}">Properties</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">About</a>

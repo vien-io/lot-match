@@ -6,9 +6,12 @@ use App\Http\Controllers\LotController;  // import lot controller
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 
 
 
@@ -27,6 +30,12 @@ Route::get('/lots', [LotController::class, 'index']); */
 
 // route for homepage
 Route::get('/homepage', [HomeController::class, 'index'])->name('homepage');
+
+// route for explore button
+Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
+
+// route for properties button
+Route::get('/properties', [PropertyController::class, 'index'])->name('properties');
 
 // route to 3d map
 Route::get('/3dmap', function(){
