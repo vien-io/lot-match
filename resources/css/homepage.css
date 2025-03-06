@@ -1,0 +1,53 @@
+.hero-section {
+    background: url('/images/paper.jpg') no-repeat center center/cover;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(50, 50, 50);
+    text-align: center;
+    margin-top: -30px;
+}
+
+.cta-buttons a {
+    margin: 10px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.featured-properties .property-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.how-it-works .steps {
+    display: flex;
+    justify-content: space-between;
+}
+
+.testimonials {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+}
+
+
+/* View Details Button */
+.property-card .btn-primary {
+    background-color: rgb(42, 115, 115); /* Dark teal background */
+    color: white; /* White text */
+}
+
+.property-card .btn-primary:hover {
+    background-color: #358f8f; /* Lighter teal on hover */
+}

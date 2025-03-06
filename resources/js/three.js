@@ -6,10 +6,6 @@ import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { EffectComposer } from 'three/examples/jsm/Addons.js';
 import { RenderPass } from 'three/examples/jsm/Addons.js';
 import { OutlinePass } from 'three/examples/jsm/Addons.js';
-/*
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-*/
 
 // gsap for cam animation
 import gsap from "gsap";
@@ -22,12 +18,12 @@ function initThreeJS() {
 
     // cam
     const camera = new THREE.PerspectiveCamera(
-        80, 
+        40,
         window.innerWidth / window.innerHeight,
         0.1,
         1000,
     );
-    camera.position.set(0 , 30, 0);
+    camera.position.set(0 , 60, 0);
     camera.lookAt(0, 0, 0);
 
 
@@ -236,7 +232,22 @@ window.addEventListener("mousemove", (event) => {
 });
 
 
+/* 
+// zoom and rotate
 
+let clickedObject = null;
+window.addEventListener("click", (event) => {
+    if (!model) {
+        console.log("model is still null! click is ignored");
+        return;
+    }
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+
+});
+ */
 
 
 

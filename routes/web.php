@@ -2,14 +2,18 @@
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LotController;  // import lot controller
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+
 
 Auth::routes(['verify' => true]); // enable pass reset route
+
 
 
 
@@ -18,8 +22,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// route for lots
-Route::get('/lots', [LotController::class, 'index']);
+/* // route for lots
+Route::get('/lots', [LotController::class, 'index']); */
+
+// route for homepage
+Route::get('/homepage', [HomeController::class, 'index'])->name('homepage');
 
 // route to 3d map
 Route::get('/3dmap', function(){
@@ -48,4 +55,8 @@ Route::post('/signup', [RegisterController::class, 'register'])->name('signup');
 
 
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+
+/* Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+ */

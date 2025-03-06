@@ -6,3 +6,106 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+/* Custom Navbar */
+.custom-navbar {
+    background-color: rgb(42, 115, 115); /* Dark teal background for the navbar */
+    height: 60px; /* Ensures navbar stays compact */
+    padding: 8px 0; 
+    border-bottom: 1px solid #ddd; /* Optional: adds a subtle border */
+}
+
+/* Navbar Brand */
+.custom-navbar .navbar-brand {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff !important; /* White text for contrast */
+}
+
+/* Centering Navbar Links */
+.custom-navbar .navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Space between links */
+}
+
+/* Navbar Links */
+.custom-navbar .nav-item .nav-link {
+    color: #ffffff !important; /* White text for better visibility */
+    font-size: 16px;
+    padding: 8px 12px;
+    transition: 0.3s;
+}
+
+.custom-navbar .nav-item .nav-link:hover {
+    background-color: #1a6b6b; /* Slightly lighter teal background on hover */
+    color: #ffffff !important; /* White text when hovering */
+    border-radius: 5px;
+}
+
+/* Authentication Buttons */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-buttons .btn {
+    font-size: 14px;
+    padding: 6px 12px;
+    background-color: rgb(42, 115, 115); /* Dark teal buttons */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.auth-buttons .btn:hover {
+    background-color: #358f8f; /* Lighter teal on hover */
+}
+
+/* Default Explore Button */
+.cta-buttons .btn-primary {
+    background: linear-gradient(45deg, #2a7373, #1e6b6b); /* Dark teal gradient */
+    border: none;
+    font-size: 1.2rem;
+    padding: 12px 24px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(42, 115, 115, 0.5); /* Adjusted shadow to match the color */
+    cursor: pointer;
+}
+
+/* Hover Effect */
+.cta-buttons .btn-primary:hover {
+    background: linear-gradient(45deg, #1e6b6b, #2a7373); /* Inverse teal gradient */
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(42, 115, 115, 0.6); /* Adjusted shadow for hover state */
+}
+
+/* Active (Pressed) Effect */
+.cta-buttons .btn-primary:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #1a5d5d, #164d4d); /* Darker teal for pressed state */
+}
+
+/* Release Effect */
+.cta-buttons .btn-primary:not(:active) {
+    animation: releaseEffect 0.2s ease-out;
+}
+
+/* Keyframes for bounce-back effect */
+@keyframes releaseEffect {
+    0% {
+        transform: scale(0.9);
+    }
+    60% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

@@ -3,26 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Lot; // Assuming you have a Lot model
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        return view('home');
+        $lots = Lot::latest()->take(6)->get(); // Fetch latest 6 featured lots
+      /*   dd($lots); // Debugging: Check if lots are retrieved */
+        return view('homepage', compact('lots'));
     }
 }
+
