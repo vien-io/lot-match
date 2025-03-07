@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Lot extends Model 
+class Contact extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'size', 'price', 'block_number']; // Add block_number
+    // Allow mass assignment for only the required fields
+    protected $fillable = ['name', 'email', 'message'];
 }

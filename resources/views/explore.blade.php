@@ -8,14 +8,22 @@
     <div class="card shadow-sm p-3 mt-4">
         <form action="{{ route('explore') }}" method="GET" class="row g-3">
             <div class="col-md-3">
-                <input type="text" name="location" class="form-control" placeholder="Enter location">
+                <select name="location" class="form-control">
+                    <option value="">Select Block</option>
+                    @foreach($blocks as $block)
+                    <option value="{{ $block }}">Block {{ $block }}</option>
+                    @endforeach
+                    </select>
             </div>
-            <div class="col-md-2">
-                <input type="number" name="min_price" class="form-control" placeholder="Min Price">
+            <div class="col-md-4">
+                <div class="price-range-container">
+                    <label for="priceRange" class="form-label">Price Range</label>
+                    <p id="priceValue">₱10,000 - ₱1,000,000</p>
+                </div>
+                <input type="range" class="form-range" min="10000" max="1000000" step="5000" id="priceRange" 
+                    oninput="updatePriceRange(this.value)">
             </div>
-            <div class="col-md-2">
-                <input type="number" name="max_price" class="form-control" placeholder="Max Price">
-            </div>
+
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filter</button>
             </div>
@@ -25,7 +33,7 @@
     <!-- Interactive Map (Placeholder) -->
     <div class="map-container mt-4">
         <div class="map-placeholder">
-            🗺️ <span class="text-muted">Map View Coming Soon...</span>
+            <span class="text-muted">2d map siguro ilalagay ko dito</span>
         </div>
     </div>
 
@@ -36,6 +44,8 @@
                 <div class="property-card shadow-sm">
                     <img src="{{ asset('storage/' . $lot->image) }}" alt="Lot Image" class="property-img">
                     <div class="property-info">
+                        <h4>{{ $lot->name }}</h4> <!-- Display Lot Name -->
+                        <p><strong>Block:</strong> {{ $lot->block_number }}</p> <!-- Display Block Number -->
                         <h4>{{ $lot->location }}</h4>
                         <p>Size: {{ $lot->size }} sq ft</p>
                         <p>Price: ${{ number_format($lot->price, 2) }}</p>
@@ -49,4 +59,10 @@
         @endforeach
     </div>
 </div>
+
+<script>
+function updatePriceRange(value) {
+    document.getElementById('priceValue').innerText = `₱${value}`;
+}
+</script>
 @endsection

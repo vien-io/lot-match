@@ -7,11 +7,19 @@ use App\Models\Lot;
 
 class ExploreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch all lots to display on the explore page
-        $lots = Lot::latest()->paginate(9); // Paginate to prevent long loads
+        $blocks = range(1, 20); // Example: Blocks 1 to 20
 
-        return view('explore', compact('lots'));
+        $lots = Lot::query();
+
+        if ($request->location) {
+            $lots->where('block_number', $request->location);
+        }
+
+        $lots = $lots->get();
+
+        return view('explore', compact('lots', 'blocks'));
     }
+
 }

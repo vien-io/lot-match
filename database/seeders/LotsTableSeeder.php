@@ -11,26 +11,29 @@ class LotsTableSeeder extends Seeder
     {
         DB::table('lots')->insert([
             [
-                'name' => 'Lot A1',
-                'description' => 'A beautiful lot with a great view.',
-                'size' => 120.5,
-                'price' => 250000.00,
+                'name' => 'Lot 1',
+                'description' => 'A spacious lot located in the city center.',
+                'size' => 500, // size in square meters
+                'price' => 150000, // price in PHP
+                'block_number' => '1',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Lot A2',
-                'description' => 'Spacious lot ideal for a large house.',
-                'size' => 150.0,
-                'price' => 300000.00,
+                'name' => 'Lot 2',
+                'description' => 'A residential lot with a nice view.',
+                'size' => 400,
+                'price' => 120000,
+                'block_number' => '2',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Lot B1',
-                'description' => 'Quiet and peaceful, perfect for a small family.',
-                'size' => 80.0,
-                'price' => 180000.00,
+                'name' => 'Lot 3',
+                'description' => 'A commercial lot with easy access to major roads.',
+                'size' => 800,
+                'price' => 250000,
+                'block_number' => '3',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

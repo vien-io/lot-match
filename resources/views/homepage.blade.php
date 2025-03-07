@@ -37,6 +37,8 @@
                 <div class="property-card">
                     <img src="{{ asset('storage/' . $lot->image) }}" alt="Lot Image">
                     <div class="property-info">
+                        <h4>{{ $lot->name }}</h4> <!-- Display Lot Name -->
+                        <p><strong>Block:</strong> {{ $lot->block_number }}</p> <!-- Display Block Number -->
                         <h4>{{ $lot->location }}</h4>
                         <p>Size: {{ $lot->size }} sq ft</p>
                         <p>Price: ${{ number_format($lot->price, 2) }}</p>
@@ -81,14 +83,6 @@
     </div>
 </div>
 
-
-<!-- Parallax Section -->
-<div class="parallax-section">
-    <div class="parallax-text">
-        <h2>Discover Your Perfect Property</h2>
-        <p>Explore the best lots with breathtaking views and top-tier locations.</p>
-    </div>
-</div>
 
 
 @endsection

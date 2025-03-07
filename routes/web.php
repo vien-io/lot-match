@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +38,14 @@ Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 
 // route for properties button
 Route::get('/properties', [PropertyController::class, 'index'])->name('properties');
+
+// routes using pagecontroller (static)
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+
+// route for contact
+Route::get('/contact', [ContactController::class, 'showForm'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submitForm'])->name('contact.submit');
 
 // route to 3d map
 Route::get('/3dmap', function(){
