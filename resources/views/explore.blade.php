@@ -48,7 +48,7 @@
                         <p><strong>Block:</strong> {{ $lot->block_number }}</p> <!-- Display Block Number -->
                         <h4>{{ $lot->location }}</h4>
                         <p>Size: {{ $lot->size }} sq ft</p>
-                        <p>Price: ${{ number_format($lot->price, 2) }}</p>
+                        <p>Price: ₱{{ number_format($lot->price, 2) }}</p>
                         <div class="d-flex justify-content-between">
                             <a href="#" class="btn btn-outline-primary">View Details</a>
                             <a href="#" class="btn btn-success">Reserve</a>

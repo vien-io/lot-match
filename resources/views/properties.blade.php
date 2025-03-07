@@ -36,7 +36,7 @@
                         <td><img src="{{ asset('storage/' . $lot->image) }}" class="img-thumbnail" width="80"></td>
                         <td>{{ $lot->location }}</td>
                         <td>{{ $lot->size }}</td>
-                        <td>${{ number_format($lot->price, 2) }}</td>
+                        <td>₱{{ number_format($lot->price, 2) }}</td>
                         <td>
                             @if($lot->is_reserved)
                                 <span class="badge bg-warning">Reserved</span>
