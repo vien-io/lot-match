@@ -14,7 +14,7 @@ import gsap from "gsap";
 function initThreeJS() {
     // scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x808080);
+    scene.background = new THREE.Color(0xD3D3D3);
 
     // cam
     const camera = new THREE.PerspectiveCamera(
@@ -23,14 +23,14 @@ function initThreeJS() {
         0.1,
         1000,
     );
-    camera.position.set(0 , 60, 0);
+    camera.position.set(0 , 90, 0);
     camera.lookAt(0, 0, 0);
-
+    window.threeCamera = camera; 
 
     // helpers
     const axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
-    const gridHelper = new THREE.GridHelper(30, 30);
+    const gridHelper = new THREE.GridHelper(80, 20);
     scene.add(gridHelper);
 
     // renderer

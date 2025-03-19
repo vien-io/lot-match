@@ -5,12 +5,6 @@ import '../css/homepage.css';
 
 
 
-document.addEventListener('DOMContentLoaded', () =>{
-    if (window.location.pathname == "/3dmap") {
-        initThreeJS();
-    }
-});
-
 
 
 
@@ -35,12 +29,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname === "/3dmap") {
+        initThreeJS();
 
-
-
-
-
-document.addEventListener("scroll", function () {
-    let scrollPosition = window.scrollY;
-    document.querySelector(".parallax-section").style.backgroundPositionY = `${scrollPosition * 0.5}px`;
+        document.querySelectorAll("#block-list li").forEach(item => {
+            item.addEventListener("click", function () {
+                const blockName = this.getAttribute("data-block");
+                moveCameraToBlock(blockName);
+            });
+        });
+    }
 });
+
+// Function to move camera smoothly
+function moveCameraToBlock(blockName) {
+    if (!window.threeCamera) return;
+
+    let targetPosition;
+    switch (blockName) {
+        case "block1":
+            targetPosition = { x: 10, y: 30, z: 10 };
+            break;
+        case "block2":
+            targetPosition = { x: -10, y: 30, z: 10 };
+            break;
+        case "block3":
+            targetPosition = { x: 10, y: 30, z: -10 };
+            break;
+        case "block4":
+            targetPosition = { x: -10, y: 30, z: -10 };
+            break;
+        default:
+            return;
+    }
+
+    gsap.to(window.threeCamera.position, {
+        x: targetPosition.x,
+        y: targetPosition.y,
+        z: targetPosition.z,
+        duration: 1.5,
+        ease: "power2.inOut",
+        onUpdate: function () {
+            window.threeCamera.lookAt(0, 0, 0);
+        }
+    });
+}
+
+document.getElementById('toggle-panel').addEventListener('click', function () {
+    let panel = document.getElementById('side-panel');
+    panel.style.transform = panel.style.transform === 'translateX(-100%)' ? 'translateX(0)' : 'translateX(-100%)';
+});
+
+
+/* detect block selection */

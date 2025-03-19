@@ -51,3 +51,86 @@
 .property-card .btn-primary:hover {
     background-color: #358f8f; /* Lighter teal on hover */
 }
+
+
+
+
+/* sidepanel */
+/* Remove scrolling */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Disable scrolling */
+    height: 100%;
+}
+
+/* Three.js full-screen container */
+#threejs-container {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+/* Floating Side Panel */
+#side-panel {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 320px; /* Adjustable */
+    height: calc(100vh - 20px);
+    background: rgba(255, 255, 255, 0.95); /* Light background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    padding: 20px;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    z-index: 100;
+    transition: transform 0.3s ease-in-out;
+    pointer-events: auto; /* Ensures it remains interactive */
+}
+
+/* Optional: Hide scrollbar for a cleaner look */
+#side-panel::-webkit-scrollbar {
+    display: none;
+}
+#toggle-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 101;
+    background: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+
+
+#side-panel h4 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+#block-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#block-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#block-list li:hover {
+    background: #0056b3;
+}
