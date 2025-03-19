@@ -2,6 +2,8 @@ import './bootstrap';
 import * as THREE from 'three';
 import initThreeJS from './three';
 import '../css/homepage.css';
+import { gsap } from "gsap";
+
 
 document.addEventListener("DOMContentLoaded", function () {
     let buttons = document.querySelectorAll(".btn-primary");
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error("Error fetching blocks:", error));
     }
 });
-
+/* 
 // Function to move camera smoothly
 function moveCameraToBlock(blockName) {
     if (!window.threeCamera) return;
@@ -85,7 +87,7 @@ function moveCameraToBlock(blockName) {
         }
     });
 }
-
+ */
 document.getElementById('toggle-panel').addEventListener('click', function () {
     let panel = document.getElementById('side-panel');
     if (panel.style.transform === 'translateX(-100%)' || panel.style.transform === '') {
@@ -129,7 +131,7 @@ function fetchLots(blockId, blockItem) {
         .then(lots => {
             console.log("Lots received:", lots);
 
-            lotsContainer.innerHTML = ""; // Clear loading state
+            lotsContainer.innerHTML = ""; 
 
             if (lots.length === 0) {
                 lotsContainer.innerHTML = "<li>No lots available</li>";
@@ -139,7 +141,7 @@ function fetchLots(blockId, blockItem) {
             lots.forEach(lot => {
                 console.log(`Processing lot: ${JSON.stringify(lot)}`);
                 const lotItem = document.createElement("li");
-                lotItem.textContent = `Lot ${lot.block_number} - ${lot.id}`;
+                lotItem.textContent = `${lot.name}`;
                 lotsContainer.appendChild(lotItem);
             });
         })
@@ -148,3 +150,71 @@ function fetchLots(blockId, blockItem) {
             lotsContainer.innerHTML = "<li>Error loading lots</li>";
         });
 }
+
+
+// profile
+document.addEventListener("DOMContentLoaded", function () {
+    const profileIcon = document.getElementById("profile-icon");
+    const profileDropdown = document.getElementById("profile-dropdown");
+
+    profileIcon.addEventListener("click", function () {
+        profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+        if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
+            profileDropdown.style.display = "none";
+        }
+    });
+});
+
+
+/* 
+// camera mode
+let isTopDownMode = false;
+
+document.getElementById('camera-mode-btn').addEventListener('click', function () {
+    isTopDownMode = !isTopDownMode; // Toggle mode
+
+    if (isTopDownMode) {
+        switchToTopDownCamera();
+    } else {
+        switchToDefaultCamera();
+    }
+});
+
+function switchToTopDownCamera() {
+    if (!window.threeCamera) return;
+
+    gsap.to(window.threeCamera.position, {
+        x: 0,
+        y: 50, // Higher elevation
+        z: 50, // Position at an angle
+        duration: 1.5,
+        ease: "power2.inOut",
+        onUpdate: function () {
+            window.threeCamera.lookAt(0, 0, 0);
+        }
+    });
+
+    console.log("Switched to Top-Down Camera Mode");
+}
+
+function switchToDefaultCamera() {
+    if (!window.threeCamera) return;
+
+    gsap.to(window.threeCamera.position, {
+        x: 0,
+        y: 90, // Normal elevation
+        z: 0,
+        duration: 1.5,
+        ease: "power2.inOut",
+        onUpdate: function () {
+            window.threeCamera.lookAt(0, 0, 0);
+        }
+    });
+
+    console.log("Switched to Default Camera Mode");
+}
+ */

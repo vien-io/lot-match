@@ -45,7 +45,7 @@ function initThreeJS() {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePAN = true;
     controls.enableRotate = true;
-    controls.enableZoom = false;
+    controls.enableZoom = true;
     controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
     controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
     controls.screenSpacePanning = true;
@@ -88,6 +88,14 @@ function initThreeJS() {
 
         selectableObjects.push(model);
         console.log("model is loaded", model); // check model load
+
+
+
+        
+        loader.load('models/housespawn.glb', function (gltf) {
+            scene.add(gltf.scene);
+            gltf.scene.position.set(20, 0, 20); // Set the spawn position dynamically
+        });
 
         /*
         // check if lights were loaded

@@ -161,3 +161,75 @@ html, body{
     background: #f9f9f9;
     cursor: pointer;
 }
+
+
+
+/* Profile icon */
+#profile-container {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#profile-icon {
+    background: white;
+    border: none;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+}
+
+#profile-icon:hover {
+    background: #f0f0f0;
+}
+
+/* Dropdown */
+#profile-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 150px;
+    text-align: center;
+}
+
+#profile-dropdown a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    padding: 5px 0;
+}
+
+#profile-dropdown a:hover {
+    background: #f0f0f0;
+}
+
+
+
+/* camera toggle */
+/* #camera-mode-btn {
+    position: absolute;
+    top: 15px;
+    left: 60px;
+    background: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    z-index: 1;
+}
+
+#camera-mode-btn:hover {
+    background: #f0f0f0;
+}
+
+ */
