@@ -9,5 +9,10 @@ class Lot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'size', 'price', 'block_number']; // Add block_number
+    protected $fillable = ['name', 'description', 'size', 'price', 'block_number', 'block_id']; 
+    
+    public function block()
+    {
+        return $this->belongsTo(Block::class, 'block_id');
+    }
 }

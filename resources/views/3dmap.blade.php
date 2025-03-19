@@ -9,16 +9,13 @@
 
     @vite(['resources/js/app.js', 'resources/css/homepage.css'])
 </head>
-<body>
+<body class="threedbody">
 <button id="toggle-panel">☰</button>
     <!-- Side Panel -->
     <div id="side-panel">
         <h4>Select a Block</h4>
         <ul id="block-list">
-            <li data-block="block1">Block 1</li>
-            <li data-block="block2">Block 2</li>
-            <li data-block="block3">Block 3</li>
-            <li data-block="block4">Block 4</li>
+            
         </ul>
     </div>
 

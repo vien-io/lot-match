@@ -57,11 +57,19 @@
 
 /* sidepanel */
 /* Remove scrolling */
-html, body {
+html, body{
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Disable scrolling */
     height: 100%;
+}
+
+.threedbody {
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
 }
 
 /* Three.js full-screen container */
@@ -74,63 +82,82 @@ html, body {
     pointer-events: none;
 }
 
-/* Floating Side Panel */
+
+/* SIDE PANEL */
 #side-panel {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 320px; /* Adjustable */
-    height: calc(100vh - 20px);
-    background: rgba(255, 255, 255, 0.95); /* Light background */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    width: 260px;
+    height: 100vh;
+    background: #ffffff;
     padding: 20px;
-    overflow-y: auto; /* Allow scrolling if content overflows */
-    z-index: 100;
+    border-right: 1px solid #e0e0e0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(0);
     transition: transform 0.3s ease-in-out;
-    pointer-events: auto; /* Ensures it remains interactive */
+}
+#side-panel h4{
+   margin-top: 60px;
+   text-align: center;
 }
 
-/* Optional: Hide scrollbar for a cleaner look */
-#side-panel::-webkit-scrollbar {
-    display: none;
-}
 #toggle-panel {
-    position: absolute;
-    top: 10px;
+    position: fixed;
     left: 10px;
-    z-index: 101;
-    background: white;
-    border: none;
-    padding: 10px;
+    top: 20px;
+    background: none;
+    color: black;
+    border: 1px solid #e0e0e0;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 8px;
+    transition: 0.2s;
+    z-index: 1;
 }
 
-
-
-#side-panel h4 {
-    margin-bottom: 10px;
-    font-size: 18px;
-    text-align: center;
+#toggle-panel:hover {
+    background: #f5f5f5;
 }
 
+/* BLOCK LIST */
 #block-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-#block-list li {
-    padding: 10px;
-    margin: 5px 0;
-    background: #007bff;
-    color: white;
-    text-align: center;
-    border-radius: 5px;
+.block-item {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    font-size: 15px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: 0.2s;
 }
 
-#block-list li:hover {
-    background: #0056b3;
+.block-item:hover {
+    background: #f5f5f5;
+}
+
+/* LOTS CONTAINER */
+.lots-container {
+    list-style: none;
+    padding: 8px;
+    margin-top: 5px;
+    border-left: 2px solid #000;
+}
+
+.lots-container li {
+    font-size: 14px;
+    padding: 6px 10px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.lots-container li:hover {
+    background: #f9f9f9;
+    cursor: pointer;
 }

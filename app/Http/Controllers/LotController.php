@@ -7,11 +7,9 @@ use App\Models\Lot;
 
 class LotController extends Controller
 {
-    public function index()
+    public function getLots($blockId)
     {
-
-        $lots = Lot::all();
-        return view('lots.index', compact('lots'));
+        $lots = Lot::where('block_id', $blockId)->get();
+        return response()->json($lots);
     }
 }
-

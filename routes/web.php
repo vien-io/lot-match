@@ -10,6 +10,7 @@ use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\BlockController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,11 @@ Route::post('/contact', [ContactController::class, 'submitForm'])->name('contact
 Route::get('/3dmap', function(){
     return view('3dmap');
 });
+
+// route for blocks
+Route::get('/blocks', [BlockController::class, 'getBlocks']);
+Route::get('/lots/{blockId}', [LotController::class, 'getLots']);
+
 
 // password reset route
 Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
