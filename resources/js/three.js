@@ -69,8 +69,8 @@ function initThreeJS() {
     // house models
     const selectableObjects = [];
     let model = null;
-    let model2 = null;
-
+ 
+/* 
     const loader = new GLTFLoader();
     loader.load('/models/sample4.glb', function (gltf) {
         model = gltf.scene;
@@ -90,27 +90,10 @@ function initThreeJS() {
         console.log("model is loaded", model); // check model load
 
 
-
-        
-        loader.load('models/housespawn.glb', function (gltf) {
-            scene.add(gltf.scene);
-            gltf.scene.position.set(20, 0, 20); // Set the spawn position dynamically
-        });
-
-        /*
-        // check if lights were loaded
-        gltf.scene.traverse((child) => {
-            if (child.isLight) {
-                console.log("Imported Light:", child);
-                child.intensity *= .0009; 
-            }
-        });
-        */
-
     },  undefined, function (error) {
         console.error('Error loading model:', error);
     });
-
+ */
     
 
     /* 
@@ -160,6 +143,53 @@ function initThreeJS() {
     });
  */
 
+    const houseLoader = new GLTFLoader();
+    const houseModelLoader = new GLTFLoader();
+    
+    // Load the scene GLB (the one with Empty objects)
+    houseLoader.load("/models/housespawn.glb", (gltf) => {
+        const sceneModel = gltf.scene;
+        scene.add(sceneModel);
+    
+        console.log("Loaded scene:", sceneModel);
+    
+    // Find all Empty objects (they have no geometry)
+    const spawnPoints = [];
+    sceneModel.traverse((child) => {
+        if (child.name.startsWith("house_spawn")) { // Identify Empty objects
+            console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
+            spawnPoints.push(child.position.clone()); // Store positions
+        }
+    });
+    console.log("Spawn points found:", spawnPoints);
+    
+
+    function getLotIdForPosition(position) {
+        // Replace with actual logic based on position
+        return Math.floor(Math.random() * 10) + 1; // Temporary random lot ID
+    }
+        // Now load the house model and place them at the spawn points
+        spawnPoints.forEach((position) => {
+            houseModelLoader.load("/models/modelH.glb", (houseGltf) => {
+                const house = houseGltf.scene;
+                house.position.copy(position);
+                house.scale.set(1, 1, 1);
+                
+                const lotId = getLotIdForPosition(position);
+                house.userData.lotId = lotId; // Assign first
+                console.log(`Assigned Lot ID: ${house.userData.lotId}`); // Now this should log the correct value
+
+                
+                console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId}`);
+                
+                scene.add(house);
+                selectableObjects.push(house);
+            });
+        });
+    });
+    
+    
+    
 
 
 
@@ -174,14 +204,14 @@ let originalMaterial = null; // to store orig mat
 
 // emissive mat
 window.addEventListener("mousemove", (event) => {
-    if (!model) return;
+    // if (!model) return;
 
     // updt mouse
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const clickableObjects = model ? model.children : []; // make sure model is loaded
+    const clickableObjects = selectableObjects.flatMap(obj => obj.children);
     const intersects = raycaster.intersectObjects(clickableObjects, true);
 
     if (intersects.length > 0) {
@@ -240,22 +270,69 @@ window.addEventListener("mousemove", (event) => {
 });
 
 
-/* 
-// zoom and rotate
 
-let clickedObject = null;
-window.addEventListener("click", (event) => {
-    if (!model) {
-        console.log("model is still null! click is ignored");
-        return;
-    }
 
+
+
+
+
+
+document.addEventListener("click", (event) => {
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // Convert mouse position to normalized device coordinates (-1 to +1)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
 
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+        let selectedObject = intersects[0].object;
+
+        // Traverse up if the object is nested in a group
+        while (selectedObject && !selectedObject.userData.lotId && selectedObject.parent) {
+            selectedObject = selectedObject.parent;
+        }
+
+        if (selectedObject.userData.lotId) {
+            const lotId = selectedObject.userData.lotId;
+            console.log(`✅ Clicked on house with Lot ID: ${lotId}`);
+            fetchLotDetails(lotId);
+        } else {
+            console.log("⚠️ No Lot ID assigned to this object!");
+        }
+    } else {
+        console.log("⚠️ Clicked on empty space.");
+    }
 });
- */
+
+// Fetch lot details from backend
+function fetchLotDetails(lotId) {
+    fetch(`http://localhost/lot_match/public/api/lot/${lotId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("❌ Error:", data.error);
+                return;
+            }
+            displayLotDetails(data); // Show details in UI
+        })
+        .catch(error => console.error("❌ Failed to fetch lot details:", error));
+}
+
+// Display lot details in UI
+function displayLotDetails(lot) {
+    const detailsPanel = document.getElementById("lot-details");
+    detailsPanel.innerHTML = `
+        <h3>Lot ID: ${lot.id}</h3>
+        <p><strong>Owner:</strong> ${lot.owner}</p>
+        <p><strong>Size:</strong> ${lot.size} sqm</p>
+        <p><strong>Price:</strong> $${lot.price}</p>
+    `;
+    detailsPanel.style.display = "block"; // Make sure the panel is visible
+}
 
 
 

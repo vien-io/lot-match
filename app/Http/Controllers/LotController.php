@@ -12,4 +12,15 @@ class LotController extends Controller
         $lots = Lot::where('block_id', $blockId)->get();
         return response()->json($lots);
     }
+
+    public function show($id)
+    {
+        $lot = Lot::find($id);
+        if (!$lot) {
+            return response()->json(['error' => 'Lot not found'], 404);
+        }
+        return response()->json($lot);
+    }
+
+    
 }

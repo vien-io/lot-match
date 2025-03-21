@@ -57,6 +57,9 @@ Route::get('/3dmap', function(){
 Route::get('/blocks', [BlockController::class, 'getBlocks']);
 Route::get('/lots/{blockId}', [LotController::class, 'getLots']);
 
+Route::get('/lots/details/{id}', [LotController::class, 'show']);
+
+
 
 // password reset route
 Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
