@@ -36,8 +36,18 @@
         </ul>
     </div>
 
-    <!-- Three.js Container -->
+    <!-- threejs container -->
     <div id="threejs-container"></div>
 
+    <!-- lot Details Modal -->
+    <div id="lot-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Lot Details</h2>
+            <div id="lot-details">
+                <!-- lot details will be dynamically added here -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>

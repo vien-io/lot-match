@@ -70,117 +70,50 @@ function initThreeJS() {
     const selectableObjects = [];
     let model = null;
  
-/* 
-    const loader = new GLTFLoader();
-    loader.load('/models/sample4.glb', function (gltf) {
-        model = gltf.scene;
-        model.position.set(0, 1, 3);
-        model.scale.set(1, 1, 1);
-        scene.add(model);
-
-         // just to make sure each model has own material
-         model.traverse((child) => {
-            if (child.isMesh) {
-                // cloning to avoid same material
-                child.material = child.material.clone();
-            }
-        });
-
-        selectableObjects.push(model);
-        console.log("model is loaded", model); // check model load
-
-
-    },  undefined, function (error) {
-        console.error('Error loading model:', error);
-    });
- */
-    
-
-    /* 
-    // composer for post-processing
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-
-    // selecting outline
-    const outlinePass = new OutlinePass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        scene,
-        camera
-    );
-    outlinePass.edgeStrength = 3;
-    outlinePass.edgeGlow = 0.001;
-    outlinePass.edgeThickness = 0.00001;
-    outlinePass.visibleEdgeColor.set(0xffffff);
-    outlinePass.hiddenEdgeColor.set(0x000000); // black for hidden edges
-
-    composer.addPass(outlinePass);
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let selectedObject = null;
-    let isZoomed = false; // for zooming
-
-    // highlight effect
-    window.addEventListener("mousemove", (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera);
-        const clickableObjects = model.children;
-        const intersects = raycaster.intersectObjects(clickableObjects, true);
-
-        if (intersects.length > 0) {
-            const hoveredObject = intersects[0].object;
-
-            if (hoveredObject !== selectedObject) {
-                selectedObject = hoveredObject;
-                outlinePass.selectedObjects = [selectedObject]; // put the outline
-            }
-        } else {
-            outlinePass.selectedObjects = []; // remove outline
-            selectedObject = null;
-        } 
-    });
- */
 
     const houseLoader = new GLTFLoader();
     const houseModelLoader = new GLTFLoader();
     
-    // Load the scene GLB (the one with Empty objects)
+    // load the scene GLB (the one with Empty objects)
     houseLoader.load("/models/housespawn.glb", (gltf) => {
         const sceneModel = gltf.scene;
         scene.add(sceneModel);
     
         console.log("Loaded scene:", sceneModel);
     
-    // Find all Empty objects (they have no geometry)
+    // find all empties
     const spawnPoints = [];
+    const spawnObjects = [];
+
     sceneModel.traverse((child) => {
-        if (child.name.startsWith("house_spawn")) { // Identify Empty objects
+        if (child.name.startsWith("lot")) { 
             console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
-            spawnPoints.push(child.position.clone()); // Store positions
+            spawnPoints.push(child.position.clone());
+
+            // extract lot id and block id from obj name
+            const parts = child.name.split("_"); 
+            const lotId = parts[1];  
+            const blockId = parts[3]; 
+
+            spawnObjects.push({ position: child.position.clone(), lotId, blockId });
         }
     });
-    console.log("Spawn points found:", spawnPoints);
-    
 
-    function getLotIdForPosition(position) {
-        // Replace with actual logic based on position
-        return Math.floor(Math.random() * 10) + 1; // Temporary random lot ID
-    }
-        // Now load the house model and place them at the spawn points
-        spawnPoints.forEach((position) => {
+    console.log("Spawn points found:", spawnPoints);
+
+        // load the house model and place them at the spawn points
+        spawnObjects.forEach(({ position, lotId, blockId }) => {
             houseModelLoader.load("/models/modelH.glb", (houseGltf) => {
                 const house = houseGltf.scene;
                 house.position.copy(position);
                 house.scale.set(1, 1, 1);
-                
-                const lotId = getLotIdForPosition(position);
-                house.userData.lotId = lotId; // Assign first
-                console.log(`Assigned Lot ID: ${house.userData.lotId}`); // Now this should log the correct value
 
-                
-                console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId}`);
+                // assign extracted lot and block ids
+                house.userData.lotId = lotId; 
+                house.userData.blockId = blockId; 
+
+                console.log(`Assigned Lot ID: ${lotId}, Block ID: ${blockId}`); 
+                console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId} and Block ID: ${blockId}`);
                 
                 scene.add(house);
                 selectableObjects.push(house);
@@ -277,67 +210,99 @@ window.addEventListener("mousemove", (event) => {
 
 
 
+
 document.addEventListener("click", (event) => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-
-    // Convert mouse position to normalized device coordinates (-1 to +1)
+    
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
-
+    
     if (intersects.length > 0) {
         let selectedObject = intersects[0].object;
-
-        // Traverse up if the object is nested in a group
+        
+        // traverse up to find the group if necessary
         while (selectedObject && !selectedObject.userData.lotId && selectedObject.parent) {
             selectedObject = selectedObject.parent;
         }
 
         if (selectedObject.userData.lotId) {
             const lotId = selectedObject.userData.lotId;
-            console.log(`✅ Clicked on house with Lot ID: ${lotId}`);
-            fetchLotDetails(lotId);
+            console.log(`Clicked on house with Lot ID: ${selectedObject.userData.lotId}`);
+             // fetch lot details from the backend
+             fetch(`/lot/${lotId}`)
+             .then(response => response.json())
+             .then(data => {
+                console.log('✅ Lot Data Received:', data); 
+                 if (data.error) {
+                     console.error(data.error);
+                 } else {
+                     showLotDetails(data);  // call function to display the details
+                 }
+             })
+             .catch(err => {
+                 console.error('Error fetching lot details:', err);
+             });
         } else {
-            console.log("⚠️ No Lot ID assigned to this object!");
+            console.log("No Lot ID assigned to this object!");
         }
     } else {
-        console.log("⚠️ Clicked on empty space.");
+        console.log("Clicked on empty space.");
     }
 });
 
-// Fetch lot details from backend
-function fetchLotDetails(lotId) {
-    fetch(`http://localhost/lot_match/public/api/lot/${lotId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error("❌ Error:", data.error);
-                return;
-            }
-            displayLotDetails(data); // Show details in UI
-        })
-        .catch(error => console.error("❌ Failed to fetch lot details:", error));
-}
 
-// Display lot details in UI
-function displayLotDetails(lot) {
+// function to display lot details
+function showLotDetails(lot) {
+    console.log("📌 showLotDetails Called with:", lot);
+    const detailsContainer = document.getElementById("lot-details-container");
     const detailsPanel = document.getElementById("lot-details");
-    detailsPanel.innerHTML = `
-        <h3>Lot ID: ${lot.id}</h3>
-        <p><strong>Owner:</strong> ${lot.owner}</p>
-        <p><strong>Size:</strong> ${lot.size} sqm</p>
-        <p><strong>Price:</strong> $${lot.price}</p>
-    `;
-    detailsPanel.style.display = "block"; // Make sure the panel is visible
+    const modal = document.getElementById("lot-modal");
+    const closeButton = document.querySelector(".close-btn");
+
+    if (!detailsPanel) {
+        console.error("❌ Lot details panel not found!");
+        return;
+    }
+    if (!modal || !detailsPanel) {
+        console.error("❌ Modal not found!");
+        return;
+    }
+
+
+    // check if details panel exists
+    if (detailsPanel) {
+        // lot details
+        detailsPanel.innerHTML = `
+            <h3>Lot ID: ${lot.id}</h3>
+            <p><strong>Name:</strong> ${lot.name}</p>
+            <p><strong>Description:</strong> ${lot.description}</p>
+            <p><strong>Size:</strong> ${lot.size} sqm</p>
+            <p><strong>Price:</strong> $${lot.price}</p>
+            <p><strong>Block Number:</strong> ${lot.block_number}</p>
+        `;
+
+         // show modal
+        modal.style.display = "flex";
+
+        // close modal when clicking close 
+        closeButton.onclick = () => {
+            modal.style.display = "none";
+        };
+
+        // close modal when clicking outside
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+    } else {
+        console.error("Lot details panel not found!");
+    }
 }
-
-
-
-
-
 
 
 

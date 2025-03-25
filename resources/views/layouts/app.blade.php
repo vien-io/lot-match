@@ -70,10 +70,7 @@
             @yield('content')
         </main>
     </div>
-    <div id="lot-details" class="details-panel">
-    <h3>Lot Details</h3>
-    <p>Select a house to see details.</p>
-</div>
+
     
 </body>
 </html>
