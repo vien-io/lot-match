@@ -31,9 +31,7 @@
     <!-- Side Panel -->
     <div id="side-panel">
         <h4>Select a Block</h4>
-        <ul id="block-list">
-            
-        </ul>
+        <ul id="block-list"></ul>
     </div>
 
     <!-- threejs container -->
@@ -49,5 +47,10 @@
             </div>
         </div>
     </div>
+
+    <div id="tooltip">
+        Lot: <span id="tooltip-text"></span>
+    </div>
+
 </body>
 </html>

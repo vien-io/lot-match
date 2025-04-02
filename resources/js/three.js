@@ -2,11 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
-// post processing modules
-import { EffectComposer } from 'three/examples/jsm/Addons.js';
-import { RenderPass } from 'three/examples/jsm/Addons.js';
-import { OutlinePass } from 'three/examples/jsm/Addons.js';
-
 // gsap for cam animation
 import gsap from "gsap";
 
@@ -66,9 +61,8 @@ function initThreeJS() {
     scene.add(lightHelper);
 
 
-        // house models
+    // house models
     const selectableObjects = [];
-    let model = null;
 
     const houseLoader = new GLTFLoader();
     const houseModelLoader = new GLTFLoader();
@@ -96,6 +90,15 @@ function initThreeJS() {
 
                 // Now also store the rotation of the spawn point
                 spawnObjects.push({ position: child.position.clone(), rotation: child.rotation.clone(), lotId, blockId });
+            }
+
+
+
+
+            // detect & add blocks
+            if (child.name.startsWith("block_")) {
+                console.log(`Found Block: ${child.name}`);
+                selectableObjects.push(child); // add to selectable objects
             }
         });
 
@@ -127,184 +130,362 @@ function initThreeJS() {
     
 
 
-
-
-
-
-// for highlighting selected objs
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let selectedObject = null;
-let originalMaterial = null; // to store orig mat
-
-// emissive mat
-window.addEventListener("mousemove", (event) => {
-    // if (!model) return;
-
-    // updt mouse
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const clickableObjects = selectableObjects.flatMap(obj => obj.children);
-    const intersects = raycaster.intersectObjects(clickableObjects, true);
-
-    if (intersects.length > 0) {
-        const hoveredObject = intersects[0].object;
-
-        if (hoveredObject !== selectedObject) {
-            if (selectedObject) {
-                // reset prev obj mat to orig (not emissive)
-                if (Array.isArray(selectedObject.material)) {
-                    selectedObject.material.forEach(mat => {
-                        mat.emissive.set(0x000000);  // reset em color
-                        mat.emissiveIntensity = 0; // remove intensity
-                    });
-                } else {
-                    selectedObject.material.emissive.set(0x000000);
-                    selectedObject.material.emissiveIntensity = 0;
-                }
-            }
-
-            selectedObject = hoveredObject;
-            originalMaterial = selectedObject.material; // store orig mat
-
-            // apply em to hovered objs (for all materials)
-            if (Array.isArray(selectedObject.material)) {
-                selectedObject.material.forEach(mat => {
-                    mat.emissive.set(0xffff00); // yellow glow
-                    mat.emissiveIntensity = 1; 
-
-                    // to make sure texture is not affected by em color
-                    mat.emissiveMap = mat.map;  // diffuse map as the emissive map
-                    mat.emissive = new THREE.Color(0xffff00); // making sure emissive color is applied
-                });
-            } else {
-                selectedObject.material.emissive.set(0xffff00); // yellow glow
-                selectedObject.material.emissiveIntensity = 4;
-                selectedObject.material.emissiveMap = selectedObject.material.map; // diffuse map as em map
-                selectedObject.material.emissive = new THREE.Color(0xffff00); // apply em color
-            }
-        }
-    } else {
-        if (selectedObject) {
-            // reset em color when no obj is hovered
-            if (Array.isArray(selectedObject.material)) {
-                selectedObject.material.forEach(mat => {
-                    mat.emissive.set(0x000000);
-                    mat.emissiveIntensity = 0;
-                });
-            } else {
-                // selectedObject.material.emissive.set(0x000000);
-                selectedObject.material.emissive.set(0xffffff);
-                selectedObject.material.emissiveIntensity = 0;
-            }
-            selectedObject = null;
-        }
-    }
-});
-
-
-
-
-
-
-
-
-
-
-document.addEventListener("click", (event) => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let selectedHouse = null;
+    let selectedBlock = null;
+    const tooltip = document.getElementById('tooltip');
+    const tooltipText = document.getElementById('tooltip-text');
     
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    window.addEventListener("mousemove", (event) => {
+        // updt mouse coords
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(selectableObjects, true);
     
-    if (intersects.length > 0) {
-        let selectedObject = intersects[0].object;
-        
-        // traverse up to find the group if necessary
-        while (selectedObject && !selectedObject.userData.lotId && selectedObject.parent) {
-            selectedObject = selectedObject.parent;
-        }
-
-        if (selectedObject.userData.lotId) {
-            const lotId = selectedObject.userData.lotId;
-            console.log(`Clicked on house with Lot ID: ${selectedObject.userData.lotId}`);
-             // fetch lot details from the backend
-             fetch(`/lot/${lotId}`)
-             .then(response => response.json())
-             .then(data => {
-                console.log('✅ Lot Data Received:', data); 
-                 if (data.error) {
-                     console.error(data.error);
-                 } else {
-                     showLotDetails(data);  // call function to display the details
-                 }
-             })
-             .catch(err => {
-                 console.error('Error fetching lot details:', err);
-             });
-        } else {
-            console.log("No Lot ID assigned to this object!");
-        }
-    } else {
-        console.log("Clicked on empty space.");
-    }
-});
+        if (intersects.length > 0) {
+            let hoveredObject = intersects[0].object;
 
 
-// function to display lot details
-function showLotDetails(lot) {
-    console.log("📌 showLotDetails Called with:", lot);
-    const detailsContainer = document.getElementById("lot-details-container");
-    const detailsPanel = document.getElementById("lot-details");
-    const modal = document.getElementById("lot-modal");
-    const closeButton = document.querySelector(".close-btn");
-
-    if (!detailsPanel) {
-        console.error("❌ Lot details panel not found!");
-        return;
-    }
-    if (!modal || !detailsPanel) {
-        console.error("❌ Modal not found!");
-        return;
-    }
 
 
-    // check if details panel exists
-    if (detailsPanel) {
-        // lot details
-        detailsPanel.innerHTML = `
-            <h3>Lot ID: ${lot.id}</h3>
-            <p><strong>Name:</strong> ${lot.name}</p>
-            <p><strong>Description:</strong> ${lot.description}</p>
-            <p><strong>Size:</strong> ${lot.size} sqm</p>
-            <p><strong>Price:</strong> $${lot.price}</p>
-            <p><strong>Block Number:</strong> ${lot.block_number}</p>
-        `;
 
-         // show modal
-        modal.style.display = "flex";
 
-        // close modal when clicking close 
-        closeButton.onclick = () => {
-            modal.style.display = "none";
-        };
 
-        // close modal when clicking outside
-        window.onclick = (event) => {
-            if (event.target === modal) {
-                modal.style.display = "none";
+
+
+
+
+
+
+            // handle block highlightings
+            if (hoveredObject.name.startsWith("block_")) {
+                if (hoveredObject !== selectedBlock) {
+                    // reset prev block glow
+                    if (selectedBlock) {
+                        selectedBlock.traverse(child => {
+                            if (child.isMesh && child.material) {
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach(mat => {
+                                        mat.emissive.set(0x000000);
+                                        mat.emissiveIntensity = 0;
+                                    });
+                                } else {
+                                    child.material.emissive.set(0x000000);
+                                    child.material.emissiveIntensity = 0;
+                                }
+                            }
+                        });
+                    }
+
+                    selectedBlock = hoveredObject; // set new block selection
+
+                    // apply emissive glow to all meshes in the block
+                    selectedBlock.traverse(child => {
+                        if (child.isMesh && child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(mat => {
+                                    mat.emissive.set(0xffffff); // purple glow for blocks
+                                    mat.emissiveIntensity = 1;
+                                });
+                            } else {
+                                child.material.emissive.set(0xffffff);
+                                child.material.emissiveIntensity = 1;
+                            }
+                        }
+                    });
+
+                    // show tooltip for blocks
+                    tooltipText.textContent = `Block: ${hoveredObject.name.split("_")[1]}`;
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = `${event.clientX + 10}px`;
+                    tooltip.style.top = `${event.clientY + 10}px`;
+                }
+
+                return; // exit early to prevent highlighting houses while on blocks
             }
-        };
-    } else {
-        console.error("Lot details panel not found!");
+
+
+
+
+
+
+
+
+
+
+
+
+            // reset block highlight when switching to a house
+            if (selectedBlock) {
+                selectedBlock.traverse(child => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => {
+                                mat.emissive.set(0x000000);
+                                mat.emissiveIntensity = 0;
+                            });
+                        } else {
+                            child.material.emissive.set(0x000000);
+                            child.material.emissiveIntensity = 0;
+                        }
+                    }
+                });
+                selectedBlock = null;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+    
+            // find the top-level house group
+            while (hoveredObject.parent && !selectableObjects.includes(hoveredObject)) {
+                hoveredObject = hoveredObject.parent;
+            }
+    
+            if (hoveredObject !== selectedHouse) {
+                // reset prev house glow
+                if (selectedHouse) {
+                    selectedHouse.traverse(child => {
+                        if (child.isMesh && child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(mat => {
+                                    mat.emissive.set(0x000000);
+                                    mat.emissiveIntensity = 0;
+                                });
+                            } else {
+                                child.material.emissive.set(0x000000);
+                                child.material.emissiveIntensity = 0;
+                            }
+                        }
+                    });
+                }
+    
+                selectedHouse = hoveredObject; // set new selection
+    
+                // apply emissive glow to all meshes in the house group
+                selectedHouse.traverse(child => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => {
+                                mat.emissive.set(0xffff00); // yellow glow
+                                mat.emissiveIntensity = 1;
+                            });
+                        } else {
+                            child.material.emissive.set(0xffff00);
+                            child.material.emissiveIntensity = 1;
+                        }
+                    }
+                });
+            }
+    
+            // highlight lots tooltip
+            // traverse up to find the group if necessary
+            while (hoveredObject && !hoveredObject.userData.lotId && hoveredObject.parent) {
+                hoveredObject = hoveredObject.parent;
+            }
+    
+            // if hovered object has lotId
+            if (hoveredObject.userData.lotId) {
+                const lotId = hoveredObject.userData.lotId;
+                tooltipText.textContent = `Lot: ${lotId}`;  // set tooltip text
+                tooltip.style.display = 'block';  // show tooltip
+                const position = hoveredObject.getWorldPosition(new THREE.Vector3());
+                tooltip.style.left = `${event.clientX + 10}px`; // adjust x position
+                tooltip.style.top = `${event.clientY + 10}px`; // adjust y position
+            }
+    
+        } else {
+             // reset block highlight when hovering over nothing
+            if (selectedBlock) {
+                selectedBlock.traverse(child => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => {
+                                mat.emissive.set(0x000000);
+                                mat.emissiveIntensity = 0;
+                            });
+                        } else {
+                            child.material.emissive.set(0x000000);
+                            child.material.emissiveIntensity = 0;
+                        }
+                    }
+                });
+                selectedBlock = null;
+            }
+
+
+
+
+
+
+
+            // reset prev house glow when nothing is hovered
+            if (selectedHouse) {
+                selectedHouse.traverse(child => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => {
+                                mat.emissive.set(0x000000);
+                                mat.emissiveIntensity = 0;
+                            });
+                        } else {
+                            child.material.emissive.set(0x000000);
+                            child.material.emissiveIntensity = 0;
+                        }
+                    }
+                });
+                selectedHouse = null;
+            }
+    
+            // hide tooltip when no object hovered
+            tooltip.style.display = 'none';
+        }
+    });
+    
+
+
+
+
+
+
+
+
+
+
+    // hndling mouse clicks to fetch lot details
+    document.addEventListener("mousedown", (event) => { 
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        // conv mouse pos to ndc (-1 to 1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        
+        if (intersects.length > 0) {
+            let selectedObject = intersects[0].object;
+            
+            // traverse up to find the group if necessary
+            while (selectedObject && !selectedObject.userData.lotId && selectedObject.parent) {
+                selectedObject = selectedObject.parent;
+            }
+    
+            if (selectedObject.userData.lotId) {
+                const lotId = selectedObject.userData.lotId;
+                console.log(`clicked on house with lot id: ${lotId}`);
+    
+                // fetch lot details from backend
+                fetch(`/lot/${lotId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('✅ lot data received:', data); 
+                        if (data.error) {
+                            console.error(data.error);
+                        } else {
+                            showLotDetails(data); // display lot details
+                        }
+                    })
+                    .catch(err => {
+                        console.error('error fetching lot details:', err);
+                    });
+            } else {
+                console.log("no lot id assigned to this object!");
+            }
+        } else {
+            console.log("clicked on empty space.");
+        }
+    });
+    
+    // function to display lot details
+    function showLotDetails(lot) {
+        console.log("📌 showLotDetails Called with:", lot);
+        const detailsContainer = document.getElementById("lot-details-container");
+        const detailsPanel = document.getElementById("lot-details");
+        const modal = document.getElementById("lot-modal");
+        const closeButton = document.querySelector(".close-btn");
+    
+        if (!detailsPanel) {
+            console.error("❌ Lot details panel not found!");
+            return;
+        }
+        if (!modal || !detailsPanel) {
+            console.error("❌ Modal not found!");
+            return;
+        }
+    
+        // check if details panel exists
+        if (detailsPanel) {
+            // lot details
+            detailsPanel.innerHTML = `
+                <h3>Lot ID: ${lot.id}</h3>
+                <p><strong>Name:</strong> ${lot.name}</p>
+                <p><strong>Description:</strong> ${lot.description}</p>
+                <p><strong>Size:</strong> ${lot.size} sqm</p>
+                <p><strong>Price:</strong> $${lot.price}</p>
+                <p><strong>Block Number:</strong> ${lot.block_number}</p>
+            `;
+    
+            // show modal
+            modal.style.display = "flex";
+    
+            // close modal when clicking close 
+            closeButton.onclick = () => {
+                modal.style.display = "none";
+            };
+    
+            // close modal when clicking outside
+            window.onclick = (event) => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            };
+        } else {
+            console.error("Lot details panel not found!");
+        }
     }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
