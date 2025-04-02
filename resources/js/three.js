@@ -66,46 +66,47 @@ function initThreeJS() {
     scene.add(lightHelper);
 
 
-    // house models
+        // house models
     const selectableObjects = [];
     let model = null;
- 
 
     const houseLoader = new GLTFLoader();
     const houseModelLoader = new GLTFLoader();
-    
+
     // load the scene GLB (the one with Empty objects)
-    houseLoader.load("/models/housespawn.glb", (gltf) => {
+    houseLoader.load("/models/housespawn2.glb", (gltf) => {
         const sceneModel = gltf.scene;
         scene.add(sceneModel);
-    
+
         console.log("Loaded scene:", sceneModel);
-    
-    // find all empties
-    const spawnPoints = [];
-    const spawnObjects = [];
 
-    sceneModel.traverse((child) => {
-        if (child.name.startsWith("lot")) { 
-            console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
-            spawnPoints.push(child.position.clone());
+        // find all empties
+        const spawnPoints = [];
+        const spawnObjects = [];
 
-            // extract lot id and block id from obj name
-            const parts = child.name.split("_"); 
-            const lotId = parts[1];  
-            const blockId = parts[3]; 
+        sceneModel.traverse((child) => {
+            if (child.name.startsWith("lot")) { 
+                console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
+                spawnPoints.push(child.position.clone());
 
-            spawnObjects.push({ position: child.position.clone(), lotId, blockId });
-        }
-    });
+                // extract lot id and block id from obj name
+                const parts = child.name.split("_"); 
+                const lotId = parts[1];  
+                const blockId = parts[3]; 
 
-    console.log("Spawn points found:", spawnPoints);
+                // Now also store the rotation of the spawn point
+                spawnObjects.push({ position: child.position.clone(), rotation: child.rotation.clone(), lotId, blockId });
+            }
+        });
+
+        console.log("Spawn points found:", spawnPoints);
 
         // load the house model and place them at the spawn points
-        spawnObjects.forEach(({ position, lotId, blockId }) => {
+        spawnObjects.forEach(({ position, rotation, lotId, blockId }) => {
             houseModelLoader.load("/models/modelH.glb", (houseGltf) => {
                 const house = houseGltf.scene;
-                house.position.copy(position);
+                house.position.copy(position);  // Copy position
+                house.rotation.copy(rotation);  // Copy rotation
                 house.scale.set(1, 1, 1);
 
                 // assign extracted lot and block ids
@@ -120,6 +121,7 @@ function initThreeJS() {
             });
         });
     });
+
     
     
     
