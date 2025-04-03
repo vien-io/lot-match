@@ -49,7 +49,7 @@
     </div>
 
     <div id="tooltip">
-        Lot: <span id="tooltip-text"></span>
+        <span id="tooltip-text"></span>
     </div>
 
 </body>

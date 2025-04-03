@@ -148,18 +148,6 @@ function initThreeJS() {
         if (intersects.length > 0) {
             let hoveredObject = intersects[0].object;
 
-
-
-
-
-
-
-
-
-
-
-
-
             // handle block highlightings
             if (hoveredObject.name.startsWith("block_")) {
                 if (hoveredObject !== selectedBlock) {
@@ -207,17 +195,6 @@ function initThreeJS() {
                 return; // exit early to prevent highlighting houses while on blocks
             }
 
-
-
-
-
-
-
-
-
-
-
-
             // reset block highlight when switching to a house
             if (selectedBlock) {
                 selectedBlock.traverse(child => {
@@ -236,25 +213,6 @@ function initThreeJS() {
                 selectedBlock = null;
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-    
             // find the top-level house group
             while (hoveredObject.parent && !selectableObjects.includes(hoveredObject)) {
                 hoveredObject = hoveredObject.parent;
@@ -280,12 +238,12 @@ function initThreeJS() {
     
                 selectedHouse = hoveredObject; // set new selection
     
-                // apply emissive glow to all meshes in the house group
+                // apply glow to all meshes in the house grp
                 selectedHouse.traverse(child => {
                     if (child.isMesh && child.material) {
                         if (Array.isArray(child.material)) {
                             child.material.forEach(mat => {
-                                mat.emissive.set(0xffff00); // yellow glow
+                                mat.emissive.set(0xffff00); // yellow
                                 mat.emissiveIntensity = 1;
                             });
                         } else {
@@ -305,11 +263,12 @@ function initThreeJS() {
             // if hovered object has lotId
             if (hoveredObject.userData.lotId) {
                 const lotId = hoveredObject.userData.lotId;
-                tooltipText.textContent = `Lot: ${lotId}`;  // set tooltip text
-                tooltip.style.display = 'block';  // show tooltip
+                const blockId = hoveredObject.userData.blockId; 
+                tooltipText.textContent = `Lot: ${lotId}, Block: ${blockId}`;
+                tooltip.style.display = 'block'; 
                 const position = hoveredObject.getWorldPosition(new THREE.Vector3());
-                tooltip.style.left = `${event.clientX + 10}px`; // adjust x position
-                tooltip.style.top = `${event.clientY + 10}px`; // adjust y position
+                tooltip.style.left = `${event.clientX + 10}px`; 
+                tooltip.style.top = `${event.clientY + 10}px`; 
             }
     
         } else {
@@ -330,12 +289,6 @@ function initThreeJS() {
                 });
                 selectedBlock = null;
             }
-
-
-
-
-
-
 
             // reset prev house glow when nothing is hovered
             if (selectedHouse) {
@@ -360,15 +313,6 @@ function initThreeJS() {
         }
     });
     
-
-
-
-
-
-
-
-
-
 
     // hndling mouse clicks to fetch lot details
     document.addEventListener("mousedown", (event) => { 
