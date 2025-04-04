@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
+
 // gsap for cam animation
 import gsap from "gsap";
 
@@ -72,7 +73,7 @@ function initThreeJS() {
         const sceneModel = gltf.scene;
         scene.add(sceneModel);
 
-        console.log("Loaded scene:", sceneModel);
+        // console.log("Loaded scene:", sceneModel);
 
         // find all empties
         const spawnPoints = [];
@@ -80,7 +81,7 @@ function initThreeJS() {
 
         sceneModel.traverse((child) => {
             if (child.name.startsWith("lot")) { 
-                console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
+                // console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
                 spawnPoints.push(child.position.clone());
 
                 // extract lot id and block id from obj name
@@ -97,12 +98,12 @@ function initThreeJS() {
 
             // detect & add blocks
             if (child.name.startsWith("block_")) {
-                console.log(`Found Block: ${child.name}`);
+                // console.log(`Found Block: ${child.name}`);
                 selectableObjects.push(child); // add to selectable objects
             }
         });
 
-        console.log("Spawn points found:", spawnPoints);
+        // console.log("Spawn points found:", spawnPoints);
 
         // load the house model and place them at the spawn points
         spawnObjects.forEach(({ position, rotation, lotId, blockId }) => {
@@ -116,8 +117,8 @@ function initThreeJS() {
                 house.userData.lotId = lotId; 
                 house.userData.blockId = blockId; 
 
-                console.log(`Assigned Lot ID: ${lotId}, Block ID: ${blockId}`); 
-                console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId} and Block ID: ${blockId}`);
+                // console.log(`Assigned Lot ID: ${lotId}, Block ID: ${blockId}`); 
+                // console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId} and Block ID: ${blockId}`);
                 
                 scene.add(house);
                 selectableObjects.push(house);
@@ -188,11 +189,11 @@ function initThreeJS() {
                     // show tooltip for blocks
                     tooltipText.textContent = `Block: ${hoveredObject.name.split("_")[1]}`;
                     tooltip.style.display = 'block';
-                    tooltip.style.left = `${event.clientX + 10}px`;
-                    tooltip.style.top = `${event.clientY + 10}px`;
                 }
-
-                return; // exit early to prevent highlighting houses while on blocks
+                tooltip.style.left = `${event.clientX + 10}px`;
+                tooltip.style.top = `${event.clientY + 10}px`;
+                return;
+                
             }
 
             // reset block highlight when switching to a house
@@ -253,7 +254,10 @@ function initThreeJS() {
                     }
                 });
             }
+
+            
     
+
             // highlight lots tooltip
             // traverse up to find the group if necessary
             while (hoveredObject && !hoveredObject.userData.lotId && hoveredObject.parent) {
@@ -266,7 +270,7 @@ function initThreeJS() {
                 const blockId = hoveredObject.userData.blockId; 
                 tooltipText.textContent = `Lot: ${lotId}, Block: ${blockId}`;
                 tooltip.style.display = 'block'; 
-                const position = hoveredObject.getWorldPosition(new THREE.Vector3());
+                
                 tooltip.style.left = `${event.clientX + 10}px`; 
                 tooltip.style.top = `${event.clientY + 10}px`; 
             }
@@ -314,8 +318,12 @@ function initThreeJS() {
     });
     
 
+    let modalOpen = false;
+
     // hndling mouse clicks to fetch lot details
     document.addEventListener("mousedown", (event) => { 
+        if (modalOpen) return;
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         
@@ -342,7 +350,7 @@ function initThreeJS() {
                 fetch(`/lot/${lotId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('✅ lot data received:', data); 
+                        // console.log('lot data received:', data); 
                         if (data.error) {
                             console.error(data.error);
                         } else {
@@ -360,69 +368,189 @@ function initThreeJS() {
         }
     });
     
-    // function to display lot details
     function showLotDetails(lot) {
-        console.log("📌 showLotDetails Called with:", lot);
-        const detailsContainer = document.getElementById("lot-details-container");
+        console.log("showLotDetails called with:", lot);
+        // console.log("Lot Model URL:", lot.modelUrl);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".close-btn");
     
-        if (!detailsPanel) {
-            console.error("❌ Lot details panel not found!");
+        if (!detailsPanel || !modal) {
+            console.error("Lot details panel or modal not found!");
             return;
         }
-        if (!modal || !detailsPanel) {
-            console.error("❌ Modal not found!");
-            return;
+
+        modalOpen = true;
+    
+        // Clear previous model if exists
+        let existingModelContainer = document.getElementById("model-container");
+        if (existingModelContainer) {
+            existingModelContainer.remove();
         }
     
-        // check if details panel exists
-        if (detailsPanel) {
-            // lot details
-            detailsPanel.innerHTML = `
-                <h3>Lot ID: ${lot.id}</h3>
-                <p><strong>Name:</strong> ${lot.name}</p>
-                <p><strong>Description:</strong> ${lot.description}</p>
-                <p><strong>Size:</strong> ${lot.size} sqm</p>
-                <p><strong>Price:</strong> $${lot.price}</p>
-                <p><strong>Block Number:</strong> ${lot.block_number}</p>
-            `;
+        // Create new model container
+        const modelContainer = document.createElement("div");
+        modelContainer.id = "model-container";
+        modelContainer.style.width = "100%";
+        modelContainer.style.height = "300px"; // Adjust height as needed
     
-            // show modal
-            modal.style.display = "flex";
+        detailsPanel.innerHTML = `
+            <h3>Lot ID: ${lot.id}</h3>
+            <p><strong>Name:</strong> ${lot.name}</p>
+            <p><strong>Description:</strong> ${lot.description}</p>
+            <p><strong>Size:</strong> ${lot.size} sqm</p>
+            <p><strong>Price:</strong> $${lot.price}</p>
+            <p><strong>Block Number:</strong> ${lot.block_number}</p>
+        `;
     
-            // close modal when clicking close 
-            closeButton.onclick = () => {
+        detailsPanel.appendChild(modelContainer); // Append model container inside modal
+        modal.style.display = "flex";
+    
+        // Load and display 3D model
+        if (lot.modelUrl) {
+            init3DModel(modelContainer, lot.modelUrl);
+        }
+    
+        // Close modal when clicking close
+        closeButton.onclick = () => {
+            modal.style.display = "none";
+            stop3DModel();  // Stop 3D model animation when modal is closed
+        };
+    
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            if (event.target === modal) {
                 modal.style.display = "none";
-            };
+                stop3DModel();
+                modalOpen = false;
+            }
+        };
+    }
     
-            // close modal when clicking outside
-            window.onclick = (event) => {
-                if (event.target === modal) {
-                    modal.style.display = "none";
-                }
-            };
-        } else {
-            console.error("Lot details panel not found!");
+
+
+
+
+
+
+
+
+    var model, animationFrameId;
+
+    function init3DModel(container, modelUrl) {
+        // console.log("init3dmodel called with URL:", modelUrl);
+    
+        // make sure container has no laman
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+    
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
+        container.appendChild(renderer.domElement);
+    
+        // set globally
+        window.scene = scene;     
+        window.camera = camera;  
+        window.renderer = renderer;  
+    
+        // light
+        const light = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(light);
+    
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 5);
+        scene.add(directionalLight);
+        
+        // 3d
+        const loader = new GLTFLoader();
+        loader.load(
+            modelUrl,
+            (gltf) => {
+                // console.log("model loaded", modelUrl);
+    
+                model = gltf.scene;
+    
+                // remove unwanted parts if model has multi meshes
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+    
+                scene.add(model);
+                model.rotation.x = Math.PI / 6;
+                model.rotation.y = Math.PI / 4;
+                camera.position.set(0, 1, 10);
+    
+                animate();
+            },
+            undefined,
+            (error) => {
+                console.error("Error loading model:", error);
+            }
+        );
+    
+        // rotate mdl
+        function animate() {
+            animationFrameId = requestAnimationFrame(animate);
+             if (model) {
+        model.rotation.y += 0.009;
+    }
+            renderer.render(scene, camera);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    function stop3DModel() {
+    
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;  
+        } else {
+        }
+    
+        if (window.scene) {
+            if (window.model) {
+                window.scene.remove(window.model);
+                window.model.rotation.set(0, 0, 0); 
+    
+                window.model.traverse((child) => {
+                    if (child.geometry) {
+                        
+                        child.geometry.dispose();
+                    }
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach((mat) => {
+                                mat.dispose();
+                            });
+                        } else {
+                            child.material.dispose();
+                        }
+                    }
+                });
+                window.model = null;
+            }
+    
+            // dispose renderer
+            if (window.renderer) {
+                window.renderer.dispose();
+                if (window.renderer.domElement) {
+                    window.renderer.domElement.remove();
+                }
+                window.renderer = null;
+            }
+    
+            // clear scene
+            window.scene.clear();
+            window.scene = null;
+        }
+    }
+    
+    
 
 
 

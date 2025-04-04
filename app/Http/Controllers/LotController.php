@@ -23,16 +23,15 @@ class LotController extends Controller
             return response()->json(['error' => 'Lot not found'], 404);
         }
 
-        // return lot details as a JSON response
+        // return lot details as a JSON response, including model URL
         return response()->json([
             'id' => $lot->id,
             'name' => $lot->name,
             'description' => $lot->description,
             'size' => $lot->size,
             'price' => $lot->price,
-            'block_number' => $lot->block_number
+            'block_number' => $lot->block_number,
+            'modelUrl' => $lot->model_url ? asset('models/' . $lot->model_url) : null, 
         ]);
     }
-
-    
 }

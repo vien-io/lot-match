@@ -6,21 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
-        Schema::table('lots', function (Blueprint $table) {
-            $table->unsignedBigInteger('block_id')->after('id'); // Add block_id column
-            $table->foreign('block_id')->references('id')->on('blocks')->onDelete('cascade'); // Set foreign key
-        });
+        // Check if the table 'lots' exists
+        if (Schema::hasTable('lots')) {
+            // Only proceed if 'block_id' doesn't already exist
+            if (!Schema::hasColumn('lots', 'block_id')) {
+                Schema::table('lots', function (Blueprint $table) {
+                    $table->unsignedBigInteger('block_id')->after('id'); // Adding block_id column
+                });
+            }
+        }
     }
-    
-    public function down(): void
+
+    public function down()
     {
-        Schema::table('lots', function (Blueprint $table) {
-            //
-        });
+        // Check if the column exists before trying to drop it
+        if (Schema::hasColumn('lots', 'block_id')) {
+            Schema::table('lots', function (Blueprint $table) {
+                $table->dropColumn('block_id'); // Dropping the block_id column
+            });
+        }
     }
 };

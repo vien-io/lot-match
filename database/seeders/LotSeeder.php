@@ -1,18 +1,28 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class LotSeeder extends Seeder
 {
     public function run()
-    {
-        // truncate the table before inserting new data
-        DB::table('lots')->truncate(); 
+    {  
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');  // Disable foreign key checks temporarily
+        DB::table('reviews')->delete(); 
+        DB::table('lots')->truncate();  // Truncate the lots table
+        DB::table('blocks')->truncate();  // Truncate the blocks table
 
+        // Insert records into the blocks table
+        DB::table('blocks')->insert([
+            ['id' => 1, 'name' => 'Block 1', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'name' => 'Block 2', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 3, 'name' => 'Block 3', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 4, 'name' => 'Block 4', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 5, 'name' => 'Block 5', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        // Insert records into the lots table
         DB::table('lots')->insert([
             [
                 'id' => 1,
@@ -105,5 +115,7 @@ class LotSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');  // Re-enable foreign key checks
     }
 }

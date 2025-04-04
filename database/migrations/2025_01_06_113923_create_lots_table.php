@@ -8,20 +8,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateLotsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
-        Schema::create('lots', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description');
-            $table->float('size');
-            $table->decimal('price', 10, 2);
-            $table->unsignedBigInteger('block_id'); // Add block_id column
-            $table->timestamps();
+        if (!Schema::hasTable('lots')) {
+            Schema::create('lots', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description');
+                $table->float('size');
+                $table->decimal('price', 10, 2);
+                $table->unsignedBigInteger('block_id'); // Add block_id column
+                $table->timestamps();
 
-            // Foreign key to blocks
-            $table->foreign('block_id')->references('id')->on('blocks')->onDelete('cascade');
-        });
+                // Foreign key to blocks
+                $table->foreign('block_id')->references('id')->on('blocks')->onDelete('cascade');
+            });
+        }
     }
 
     public function down()

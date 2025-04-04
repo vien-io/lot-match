@@ -51,6 +51,8 @@
     <div id="tooltip">
         <span id="tooltip-text"></span>
     </div>
-
+    <div id="house-3d-container">
+            <!-- canvas rendered here -->
+    </div>
 </body>
 </html>
