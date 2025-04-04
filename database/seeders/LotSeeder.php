@@ -8,12 +8,11 @@ class LotSeeder extends Seeder
 {
     public function run()
     {  
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');  // Disable foreign key checks temporarily
-        DB::table('reviews')->delete(); 
-        DB::table('lots')->truncate();  // Truncate the lots table
-        DB::table('blocks')->truncate();  // Truncate the blocks table
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;'); 
+        DB::table('lots')->truncate();  
+        DB::table('blocks')->truncate();  
 
-        // Insert records into the blocks table
+        // insert records to block table
         DB::table('blocks')->insert([
             ['id' => 1, 'name' => 'Block 1', 'created_at' => now(), 'updated_at' => now()],
             ['id' => 2, 'name' => 'Block 2', 'created_at' => now(), 'updated_at' => now()],
@@ -22,7 +21,7 @@ class LotSeeder extends Seeder
             ['id' => 5, 'name' => 'Block 5', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Insert records into the lots table
+        // insert records into the lots table
         DB::table('lots')->insert([
             [
                 'id' => 1,
@@ -115,7 +114,10 @@ class LotSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+        $this->call([
+            UpdateLotsWithModelUrlSeeder::class,
+        ]);
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');  // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');  
     }
 }

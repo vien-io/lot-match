@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Lot extends Model 
+class Lot extends Model
 {
     use HasFactory;
     
     protected $table = 'lots';
 
-    protected $fillable = ['name', 'description', 'size', 'price', 'block_number', 'block_id']; 
+
+    protected $fillable = ['name', 'description', 'size', 'price', 'block_id']; 
     
+ 
     public function block()
     {
         return $this->belongsTo(Block::class, 'block_id');

@@ -8,24 +8,22 @@ return new class extends Migration
 {
     public function up()
     {
-        // Check if the table 'lots' exists
-        if (Schema::hasTable('lots')) {
-            // Only proceed if 'block_id' doesn't already exist
-            if (!Schema::hasColumn('lots', 'block_id')) {
-                Schema::table('lots', function (Blueprint $table) {
-                    $table->unsignedBigInteger('block_id')->after('id'); // Adding block_id column
-                });
-            }
+        // remove the block_number column from the lots table
+        if (Schema::hasColumn('lots', 'block_number')) {
+            Schema::table('lots', function (Blueprint $table) {
+                $table->dropColumn('block_number');
+            });
         }
     }
 
     public function down()
     {
-        // Check if the column exists before trying to drop it
-        if (Schema::hasColumn('lots', 'block_id')) {
+        // add the block_number column back if rolling back migration
+        if (!Schema::hasColumn('lots', 'block_number')) {
             Schema::table('lots', function (Blueprint $table) {
-                $table->dropColumn('block_id'); // Dropping the block_id column
+                $table->string('block_number')->after('block_id');
             });
         }
     }
 };
+

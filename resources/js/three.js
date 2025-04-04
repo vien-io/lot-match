@@ -139,6 +139,21 @@ function initThreeJS() {
     const tooltipText = document.getElementById('tooltip-text');
     
     window.addEventListener("mousemove", (event) => {
+        // check if mouse is on left panel
+        const leftPanel = document.getElementById("side-panel"); 
+        const panelRect = leftPanel.getBoundingClientRect();
+        if (
+            event.clientX >= panelRect.left &&
+            event.clientX <= panelRect.right &&
+            event.clientY >= panelRect.top &&
+            event.clientY <= panelRect.bottom
+        ) {
+            return;
+        }
+
+
+
+
         // updt mouse coords
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -324,6 +339,19 @@ function initThreeJS() {
     document.addEventListener("mousedown", (event) => { 
         if (modalOpen) return;
 
+        // ignore raycasting in left panel
+        const leftPanel = document.getElementById("side-panel"); 
+        const panelRect = leftPanel.getBoundingClientRect();
+        
+        if (
+            event.clientX >= panelRect.left &&
+            event.clientX <= panelRect.right &&
+            event.clientY >= panelRect.top &&
+            event.clientY <= panelRect.bottom
+        ) {
+            return;
+        }
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         
@@ -415,6 +443,7 @@ function initThreeJS() {
         closeButton.onclick = () => {
             modal.style.display = "none";
             stop3DModel();  // Stop 3D model animation when modal is closed
+            modalOpen = false;
         };
     
         // Close modal when clicking outside
