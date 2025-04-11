@@ -278,12 +278,11 @@ html, body{
         to { opacity: 1; transform: translateY(0); }
     }
 
-    #house-3d-container {
-        width: 100%;
-        height: 400px; /* Adjust height as needed */
-        background-color: #dcdcdc; /* Gray background to see the container */
-    }
-    
+
+.house-3d-container {
+    width: 400px; 
+    height: 400px;
+}
 
 
 

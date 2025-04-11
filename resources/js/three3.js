@@ -25,9 +25,9 @@ function initThreeJS() {
 
     // helpers
     const axesHelper = new THREE.AxesHelper(5);
-    // scene.add(axesHelper);
+    scene.add(axesHelper);
     const gridHelper = new THREE.GridHelper(80, 20);
-    // scene.add(gridHelper);
+    scene.add(gridHelper);
 
     // renderer
     const renderer = new THREE.WebGLRenderer();
@@ -59,145 +59,80 @@ function initThreeJS() {
     scene.add(light.target);
     
     const lightHelper = new THREE.DirectionalLightHelper(light, 2);
-    // scene.add(lightHelper);
+    scene.add(lightHelper);
 
 
     // house models
-    const selectableObjects = [];
+const selectableObjects = [];
 
-    const houseLoader = new GLTFLoader();
-    const houseModelLoader = new GLTFLoader();
+const houseLoader = new GLTFLoader();
+const houseModelLoader = new GLTFLoader();
 
-    // load the scene GLB (the one with Empty objects)
-    houseLoader.load("/models/housespawn.glb", (gltf) => {
-        const sceneModel = gltf.scene;
-        scene.add(sceneModel);
+// load the scene GLB (the one with Empty objects)
+houseLoader.load("/models/housespawn.glb", (gltf) => {
+    const sceneModel = gltf.scene;
+    scene.add(sceneModel);
 
-        // console.log("Loaded scene:", sceneModel);
+    // console.log("Loaded scene:", sceneModel);
 
-        // find all empties
-        const spawnPoints = [];
-        const spawnObjects = [];
+    // find all empties
+    const spawnPoints = [];
+    const spawnObjects = [];
 
-        sceneModel.traverse((child) => {
-            if (child.name.startsWith("lot")) { 
-                // console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
-                spawnPoints.push(child.position.clone());
+    sceneModel.traverse((child) => {
+        if (child.name.startsWith("lot")) { 
+            // console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
+            spawnPoints.push(child.position.clone());
 
-                // extract lot id and block id from obj name
-                const parts = child.name.split("_"); 
-                const lotId = parts[1];  
-                const blockId = parts[3]; 
+            // extract lot id and block id from obj name
+            const parts = child.name.split("_"); 
+            const lotId = parts[1];  
+            const blockId = parts[3]; 
 
-                // check id if ends with _r
-                const shouldMirror = child.name.endsWith("_r");
+            // check if name ends with "_r"
+            const shouldMirror = child.name.endsWith("_r"); // 👈🏽 mirror it if name ends in _r 😎
 
-                // store rotation of spawn point
-                spawnObjects.push({ position: child.position.clone(), rotation: child.rotation.clone(), lotId, blockId, shouldMirror });
-            }
+            // also store the rotation of the spawn point
+            spawnObjects.push({ position: child.position.clone(), rotation: child.rotation.clone(), lotId, blockId, shouldMirror }); // 👈🏽 pass that info along 🛸
+        }
 
-
-
-
-            // detect & add blocks
-            if (child.name.startsWith("block_")) {
-                // console.log(`Found Block: ${child.name}`);
-                selectableObjects.push(child); // add to selectable objects
-            }
-        });
-
-        // console.log("Spawn points found:", spawnPoints);
-
-        // load the house model and place them at the spawn points
-        spawnObjects.forEach(({ position, rotation, lotId, blockId, shouldMirror }) => {
-
-            const lod = new THREE.LOD();
-
-            // helper func to load and add to lod
-            const loadLODLevel = (url, distance, onLoad) => {
-                houseModelLoader.load(url, (gltf) => {
-                    const model = gltf.scene;
-                    model.position.set(0, 0, 0);
-                    model.scale.set(1, 1, 1);
-                    if (shouldMirror) model.scale.x *= -1;
-                    onLoad(model, distance);
-                });
-            };
-
-            loadLODLevel("/models/modelH.glb", 0, (model, dist) => {
-                model.frustumCulled = true;
-                lod.addLevel(model, dist);
-            });
-
-            loadLODLevel("/models/modelH_medium.glb", 25, (model, dist) => {
-                model.frustumCulled = true;
-                lod.addLevel(model, dist);
-            });
-
-            loadLODLevel("/models/modelH_low.glb", 50, (model, dist) => {
-                model.frustumCulled = true;
-                lod.addLevel(model, dist);
-            });
-
-            // set global rot and pos
-            lod.position.copy(position);
-            lod.rotation.copy(rotation);
-
-            // assign id 
-            lod.userData.lotId = lotId;
-            lod.userData.blockId = blockId;
-
-            lod.frustumCulled = true;
-
-            scene.add(lod);
-            selectableObjects.push(lod);
-        });
+        // detect & add blocks
+        if (child.name.startsWith("block_")) {
+            // console.log(`Found Block: ${child.name}`);
+            selectableObjects.push(child); // add to selectable objects
+        }
     });
 
-    
-    
-    
+    // console.log("Spawn points found:", spawnPoints);
 
+    // load the house model and place them at the spawn points
+    spawnObjects.forEach(({ position, rotation, lotId, blockId, shouldMirror }) => {
+        houseModelLoader.load("/models/modelH.glb", (houseGltf) => {
+            const house = houseGltf.scene;
+            house.position.copy(position);  // copy position
+            house.rotation.copy(rotation);  // copy rotation
+            house.scale.set(1, 1, 1);
 
+            if (shouldMirror) {
+                house.scale.x *= -1; // 👈🏽 flip horizontally if needed 🪞
+            }
 
+            // assign extracted lot and block ids
+            house.userData.lotId = lotId; 
+            house.userData.blockId = blockId; 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            // console.log(`Assigned Lot ID: ${lotId}, Block ID: ${blockId}`); 
+            // console.log(`House added at ${position.x}, ${position.y}, ${position.z} with Lot ID: ${lotId} and Block ID: ${blockId}`);
+            
+            scene.add(house);
+            selectableObjects.push(house);
+        });
+    });
+});
 
 
     
-
+    
     
 
 
@@ -402,35 +337,11 @@ function initThreeJS() {
         }
     });
     
+
     let modalOpen = false;
-    let isDragging = false;
-    let mouseDownPosition = { x: 0, y: 0 };
-    const dragThreshold = 5; 
 
-    document.addEventListener("mousedown", (event) => {
-        // reset position of mouse
-        mouseDownPosition.x = event.clientX;
-        mouseDownPosition.y = event.clientY;
-        isDragging = false; 
-    });
-
-    document.addEventListener("mousemove", (event) => {
-        // check if mouse moved
-        const distance = Math.sqrt(
-            Math.pow(event.clientX - mouseDownPosition.x, 2) +
-            Math.pow(event.clientY - mouseDownPosition.y, 2)
-        );
-    
-        if (distance > dragThreshold) {
-            isDragging = true; 
-        }
-    });
-
-    document.addEventListener("mouseup", (event) => {
-        if (isDragging) {
-            return;
-        }
-        
+    // hndling mouse clicks to fetch lot details
+    document.addEventListener("mousedown", (event) => { 
         if (modalOpen) return;
 
         // ignore raycasting in left panel
@@ -490,33 +401,28 @@ function initThreeJS() {
         }
     });
     
+
+    
     function showLotDetails(lot) {
         console.log("showLotDetails called with:", lot);
-        // console.log("Lot Model URL:", lot.modelUrl);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".close-btn");
-        const modal2 = document.getElementById("modal2");
-    
+        
         if (!detailsPanel || !modal) {
             console.error("Lot details panel or modal not found!");
             return;
         }
-
+    
         modalOpen = true;
     
-        // clear previous model if exists
-        let existingModelContainer = document.getElementById("house-3d-container");
+        // Clear previous model if exists
+        let existingModelContainer = document.getElementById("model-container");
         if (existingModelContainer) {
-            existingModelContainer.remove();
+            existingModelContainer.innerHTML = ""; // Clear the model container
         }
-        
-       
-        const modelContainer = document.createElement("div");
-        modelContainer.id = "house-3d-container";
-        modelContainer.style.width = "100%";
-        modelContainer.style.height = "300px"; 
     
+        // Update the lot details content
         detailsPanel.innerHTML = `
             <h3>Lot ID: ${lot.id}</h3>
             <p><strong>Name:</strong> ${lot.name}</p>
@@ -526,12 +432,13 @@ function initThreeJS() {
             <p><strong>Block Number:</strong> ${lot.block_id}</p>
         `;
     
-        detailsPanel.appendChild(modelContainer); // Append model container inside modal
+        // Open modal
         modal.style.display = "flex";
     
-        // Load and display 3D model
+        // Check container validity and then load 3D model
         if (lot.modelUrl) {
-            init3DModel(modelContainer, lot.modelUrl);
+            const modelContainer = document.getElementById("model-container");
+            waitForValidContainer(modelContainer, lot.modelUrl); // Check for valid container
         }
     
         // Close modal when clicking close
@@ -550,11 +457,17 @@ function initThreeJS() {
             }
         };
     }
-
-
-
-
-   
+    
+    function waitForValidContainer(container, modelUrl) {
+        const intervalId = setInterval(() => {
+            if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+                clearInterval(intervalId);
+                init3DModel(container, modelUrl);
+            }
+        }, 100); // check every 100ms
+    }
+    
+    
     
 
 
@@ -569,10 +482,11 @@ function initThreeJS() {
     function init3DModel(container, modelUrl) {
         // console.log("init3dmodel called with URL:", modelUrl);
     
-        // make sure container has no laman
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
+         // Check if the container has valid dimensions
+    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+        console.error("Invalid container dimensions:", container);
+        return; // Do not proceed if the container has zero size
+    }
     
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);

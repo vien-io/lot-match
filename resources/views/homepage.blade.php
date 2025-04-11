@@ -40,7 +40,7 @@
                         <h4>{{ $lot->name }}</h4> <!-- Display Lot Name -->
                         <p><strong>Block:</strong> {{ $lot->block_number }}</p> <!-- Display Block Number -->
                         <h4>{{ $lot->location }}</h4>
-                        <p>Size: {{ $lot->size }} sq ft</p>
+                        <p>Size: {{ $lot->size }} sq meters</p>
                         <p>Price: ₱{{ number_format($lot->price, 2) }}</p>
                         <a href="#" class="btn btn-primary">View Details</a>
                         {{--

@@ -90,12 +90,17 @@ function moveCameraToBlock(blockName) {
  */
 document.getElementById('toggle-panel').addEventListener('click', function () {
     let panel = document.getElementById('side-panel');
-    if (panel.style.transform === 'translateX(-100%)' || panel.style.transform === '') {
-        panel.style.transform = 'translateX(0)';
+    const currentTransform = window.getComputedStyle(panel).transform;
+
+    // Check if the panel is currently visible (transform === translateX(0))
+    if (currentTransform === 'matrix(1, 0, 0, 1, 0, 0)') { // 'matrix(1, 0, 0, 1, 0, 0)' is the computed form of 'translateX(0)'
+        panel.style.transform = 'translateX(-100%)'; // Hide the panel
     } else {
-        panel.style.transform = 'translateX(-100%)';
+        panel.style.transform = 'translateX(0)'; // Show the panel
     }
 });
+
+
 
 function fetchLots(blockId, blockItem) {
     console.log(`Fetching lots for block ID: ${blockId}`);

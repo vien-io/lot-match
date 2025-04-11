@@ -24,7 +24,7 @@
                 <tr>
                     <th>Image</th>
                     <th>Location</th>
-                    <th>Size (sq ft)</th>
+                    <th>Size (sq meters)</th>
                     <th>Price</th>
                     <th>Status</th>
                     <th>Actions</th>

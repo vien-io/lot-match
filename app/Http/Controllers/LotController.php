@@ -30,7 +30,7 @@ class LotController extends Controller
             'description' => $lot->description,
             'size' => $lot->size,
             'price' => $lot->price,
-            'block_number' => $lot->block_number,
+            'block_id' => $lot->block_id,
             'modelUrl' => $lot->model_url ? asset('models/' . $lot->model_url) : null, 
         ]);
     }

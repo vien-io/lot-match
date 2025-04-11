@@ -37,38 +37,31 @@
     <!-- threejs container -->
     <div id="threejs-container"></div>
 
-   <!-- Lot Details Modal -->
-<div class="screen_split">
-    <!-- Left: Lot Details & Ratings -->
+    <!-- lot Details Modal -->
     <div id="lot-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>Lot Details</h2>
             <div id="lot-details">
-                <!-- Lot details will be dynamically added here -->
+                <!-- lot details will be dynamically added here -->
             </div>
             <div class="reviews">
-                <!-- Display existing reviews -->
-            </div>
-            <form id="review-form">
-                <label for="rating">Rating (1-5):</label>
-                <input type="number" id="rating" name="rating" min="1" max="5" required>
-                
-                <label for="comment">Comment:</label>
-                <textarea id="comment" name="comment" rows="4" required></textarea>
-                
-                <button type="submit">Submit Review</button>
-            </form>
+            <!-- Display existing reviews -->
         </div>
-    </div>
+        <form id="review-form">
+            <label for="rating">Rating (1-5):</label>
+            <input type="number" id="rating" name="rating" min="1" max="5" required>
+            
+            <label for="comment">Comment:</label>
+            <textarea id="comment" name="comment" rows="4" required></textarea>
+            
+            <button type="submit">Submit Review</button>
+        </form>
+        </div>
+        <!-- 3D Model Container for Lot Details -->
+        <div id="lot-3d-container"></div>
 
-    <!-- Right: 3D Viewer -->
-    <div id="house-3d-container">
-        <div id="model-container" style="background-color: #dcdcdc; width: 100%; height: 100%;"></div>
-        <!-- The 3D model will be inserted here -->
     </div>
-</div>
-
 
     <div id="tooltip">
         <span id="tooltip-text"></span>
