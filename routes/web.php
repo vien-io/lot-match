@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LotController;  // import lot controller
@@ -87,6 +88,5 @@ Route::post('/signup', [RegisterController::class, 'register'])->name('signup');
 
 
 
-
-/* Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
- */
+// analytics
+Route::get('/analytics/block-ratings', [AnalyticsController::class, 'blockRatings'])->name('analytics.block_ratings');
