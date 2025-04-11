@@ -90,3 +90,6 @@ Route::post('/signup', [RegisterController::class, 'register'])->name('signup');
 
 // analytics
 Route::get('/analytics/block-ratings', [AnalyticsController::class, 'blockRatings'])->name('analytics.block_ratings');
+
+// dashboard
+Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');

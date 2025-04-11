@@ -9,7 +9,7 @@
 
 <!-- chart container -->
 <div class="chart-container">
-    <canvas id="ratingsChart" width="600" height="300"></canvas>
+    <canvas id="ratingsChart"></canvas>
 </div>
 
 <!-- table for analytics -->
