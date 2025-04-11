@@ -7,7 +7,12 @@
 @section('content')
 <h2 class="analytics-heading">Block Ratings Analytics</h2>
 
-<!-- Table in a container for better alignment -->
+<!-- chart container -->
+<div class="chart-container">
+    <canvas id="ratingsChart" width="600" height="300"></canvas>
+</div>
+
+<!-- table for analytics -->
 <div class="table-container">
     <table class="analytics-table">
         <thead>
@@ -28,4 +33,9 @@
         </tbody>
     </table>
 </div>
+<div id="ratings-data"
+     data-labels='@json($data->pluck("name"))'
+     data-ratings='@json($data->pluck("avg_rating"))'>
+</div>
+
 @endsection

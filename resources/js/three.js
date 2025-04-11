@@ -190,6 +190,80 @@ function initThreeJS() {
 
 
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById('toggle-panel');
+        console.log("toggleBtn:", toggleBtn);
+    
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                let panel = document.getElementById('side-panel');
+                const currentTransform = window.getComputedStyle(panel).transform;
+    
+                if (currentTransform === 'matrix(1, 0, 0, 1, 0, 0)') {
+                    panel.style.transform = 'translateX(-100%)';
+                } else {
+                    panel.style.transform = 'translateX(0)';
+                }
+            });
+        }
+    });
+    
+    
+    
+    
+    function fetchLots(blockId, blockItem) {
+        console.log(`Fetching lots for block ID: ${blockId}`);
+    
+        // Hide lots from other blocks
+        document.querySelectorAll(".lots-container").forEach(container => {
+            if (container.parentElement !== blockItem) {
+                container.style.display = "none";
+            }
+        });
+    
+        let lotsContainer = blockItem.querySelector(".lots-container");
+    
+        if (!lotsContainer) {
+            lotsContainer = document.createElement("ul");
+            lotsContainer.classList.add("lots-container");
+            blockItem.appendChild(lotsContainer);
+        }
+    
+        // Toggle visibility of the clicked block's lots
+        if (lotsContainer.style.display === "block") {
+            lotsContainer.style.display = "none";
+            return;
+        } else {
+            lotsContainer.style.display = "block";
+        }
+    
+        // Show loading state
+        lotsContainer.innerHTML = "<li>Loading lots...</li>";
+    
+        fetch(`/lots/${blockId}`)
+            .then(response => response.json())
+            .then(lots => {
+                console.log("Lots received:", lots);
+    
+                lotsContainer.innerHTML = ""; 
+    
+                if (lots.length === 0) {
+                    lotsContainer.innerHTML = "<li>No lots available</li>";
+                    return;
+                }
+    
+                lots.forEach(lot => {
+                    console.log(`Processing lot: ${JSON.stringify(lot)}`);
+                    const lotItem = document.createElement("li");
+                    lotItem.textContent = `${lot.name}`;
+                    lotsContainer.appendChild(lotItem);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching lots:", error);
+                lotsContainer.innerHTML = "<li>Error loading lots</li>";
+            });
+    }
 
 
 
@@ -430,7 +504,7 @@ function initThreeJS() {
         if (isDragging) {
             return;
         }
-        
+
         if (modalOpen) return;
 
         // ignore raycasting in left panel

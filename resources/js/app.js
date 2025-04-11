@@ -1,8 +1,7 @@
 import './bootstrap';
-import * as THREE from 'three';
 import initThreeJS from './three';
 import '../css/homepage.css';
-import { gsap } from "gsap";
+import { renderBlockRatingsChart } from './charts/blockRatingsChart';
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -23,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// check if 3dmap is called
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === "/3dmap") {
         initThreeJS();
@@ -53,52 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error("Error fetching blocks:", error));
     }
 });
-/* 
-// Function to move camera smoothly
-function moveCameraToBlock(blockName) {
-    if (!window.threeCamera) return;
 
-    let targetPosition;
-    switch (blockName) {
-        case "block1":
-            targetPosition = { x: 10, y: 30, z: 10 };
-            break;
-        case "block2":
-            targetPosition = { x: -10, y: 30, z: 10 };
-            break;
-        case "block3":
-            targetPosition = { x: 10, y: 30, z: -10 };
-            break;
-        case "block4":
-            targetPosition = { x: -10, y: 30, z: -10 };
-            break;
-        default:
-            return;
-    }
 
-    gsap.to(window.threeCamera.position, {
-        x: targetPosition.x,
-        y: targetPosition.y,
-        z: targetPosition.z,
-        duration: 1.5,
-        ease: "power2.inOut",
-        onUpdate: function () {
-            window.threeCamera.lookAt(0, 0, 0);
-        }
-    });
-}
- */
-document.getElementById('toggle-panel').addEventListener('click', function () {
-    let panel = document.getElementById('side-panel');
-    const currentTransform = window.getComputedStyle(panel).transform;
 
-    // Check if the panel is currently visible (transform === translateX(0))
-    if (currentTransform === 'matrix(1, 0, 0, 1, 0, 0)') { // 'matrix(1, 0, 0, 1, 0, 0)' is the computed form of 'translateX(0)'
-        panel.style.transform = 'translateX(-100%)'; // Hide the panel
-    } else {
-        panel.style.transform = 'translateX(0)'; // Show the panel
+// toggle panel
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById('toggle-panel');
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            let panel = document.getElementById('side-panel');
+            const currentTransform = window.getComputedStyle(panel).transform;
+
+            if (currentTransform === 'matrix(1, 0, 0, 1, 0, 0)') {
+                panel.style.transform = 'translateX(-100%)';
+            } else {
+                panel.style.transform = 'translateX(0)';
+            }
+        });
     }
 });
+
 
 
 
@@ -162,64 +137,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const profileIcon = document.getElementById("profile-icon");
     const profileDropdown = document.getElementById("profile-dropdown");
 
-    profileIcon.addEventListener("click", function () {
-        profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
-    });
+    if (profileIcon && profileDropdown) {
+        profileIcon.addEventListener("click", function () {
+            profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+        });
 
-    // Hide dropdown when clicking outside
-    document.addEventListener("click", function (event) {
-        if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
-            profileDropdown.style.display = "none";
-        }
-    });
-});
-
-
-/* 
-// camera mode
-let isTopDownMode = false;
-
-document.getElementById('camera-mode-btn').addEventListener('click', function () {
-    isTopDownMode = !isTopDownMode; // Toggle mode
-
-    if (isTopDownMode) {
-        switchToTopDownCamera();
-    } else {
-        switchToDefaultCamera();
+        document.addEventListener("click", function (event) {
+            if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.style.display = "none";
+            }
+        });
     }
 });
 
-function switchToTopDownCamera() {
-    if (!window.threeCamera) return;
 
-    gsap.to(window.threeCamera.position, {
-        x: 0,
-        y: 50, // Higher elevation
-        z: 50, // Position at an angle
-        duration: 1.5,
-        ease: "power2.inOut",
-        onUpdate: function () {
-            window.threeCamera.lookAt(0, 0, 0);
-        }
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    const labels = window.blockLabels || [];
+    const ratings = window.blockRatings || [];
+    renderBlockRatingsChart(labels, ratings);
+});
 
-    console.log("Switched to Top-Down Camera Mode");
-}
 
-function switchToDefaultCamera() {
-    if (!window.threeCamera) return;
 
-    gsap.to(window.threeCamera.position, {
-        x: 0,
-        y: 90, // Normal elevation
-        z: 0,
-        duration: 1.5,
-        ease: "power2.inOut",
-        onUpdate: function () {
-            window.threeCamera.lookAt(0, 0, 0);
-        }
-    });
-
-    console.log("Switched to Default Camera Mode");
-}
- */
