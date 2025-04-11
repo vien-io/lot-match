@@ -16,19 +16,16 @@ class BlocksTableSeeder extends Seeder
         DB::table('blocks')->insert([
             [
                 'name' => 'Block 1',
-                'subdivision_id' => 1,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
                 'name' => 'Block 2',
-                'subdivision_id' => 1,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
                 'name' => 'Block 3',
-                'subdivision_id' => 1,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

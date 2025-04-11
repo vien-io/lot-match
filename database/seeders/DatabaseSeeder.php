@@ -19,6 +19,13 @@ class DatabaseSeeder extends Seeder
                 'email' => 'test@example.com',
                 'password' => bcrypt('password'), 
             ]);
+
+            $this->call([
+                BlocksTableSeeder::class,            
+                LotSeeder::class,                   
+                ReviewsTableSeeder::class,          
+                UpdateLotsWithModelUrlSeeder::class 
+            ]);
         }
     }
 }
