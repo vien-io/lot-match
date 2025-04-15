@@ -190,80 +190,6 @@ function initThreeJS() {
 
 
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggleBtn = document.getElementById('toggle-panel');
-        console.log("toggleBtn:", toggleBtn);
-    
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function () {
-                let panel = document.getElementById('side-panel');
-                const currentTransform = window.getComputedStyle(panel).transform;
-    
-                if (currentTransform === 'matrix(1, 0, 0, 1, 0, 0)') {
-                    panel.style.transform = 'translateX(-100%)';
-                } else {
-                    panel.style.transform = 'translateX(0)';
-                }
-            });
-        }
-    });
-    
-    
-    
-    
-    function fetchLots(blockId, blockItem) {
-        console.log(`Fetching lots for block ID: ${blockId}`);
-    
-        // Hide lots from other blocks
-        document.querySelectorAll(".lots-container").forEach(container => {
-            if (container.parentElement !== blockItem) {
-                container.style.display = "none";
-            }
-        });
-    
-        let lotsContainer = blockItem.querySelector(".lots-container");
-    
-        if (!lotsContainer) {
-            lotsContainer = document.createElement("ul");
-            lotsContainer.classList.add("lots-container");
-            blockItem.appendChild(lotsContainer);
-        }
-    
-        // Toggle visibility of the clicked block's lots
-        if (lotsContainer.style.display === "block") {
-            lotsContainer.style.display = "none";
-            return;
-        } else {
-            lotsContainer.style.display = "block";
-        }
-    
-        // Show loading state
-        lotsContainer.innerHTML = "<li>Loading lots...</li>";
-    
-        fetch(`/lots/${blockId}`)
-            .then(response => response.json())
-            .then(lots => {
-                console.log("Lots received:", lots);
-    
-                lotsContainer.innerHTML = ""; 
-    
-                if (lots.length === 0) {
-                    lotsContainer.innerHTML = "<li>No lots available</li>";
-                    return;
-                }
-    
-                lots.forEach(lot => {
-                    console.log(`Processing lot: ${JSON.stringify(lot)}`);
-                    const lotItem = document.createElement("li");
-                    lotItem.textContent = `${lot.name}`;
-                    lotsContainer.appendChild(lotItem);
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching lots:", error);
-                lotsContainer.innerHTML = "<li>Error loading lots</li>";
-            });
-    }
 
 
 
@@ -504,7 +430,7 @@ function initThreeJS() {
         if (isDragging) {
             return;
         }
-
+        
         if (modalOpen) return;
 
         // ignore raycasting in left panel
@@ -566,11 +492,9 @@ function initThreeJS() {
     
     function showLotDetails(lot) {
         console.log("showLotDetails called with:", lot);
-        // console.log("Lot Model URL:", lot.modelUrl);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".close-btn");
-        const modal2 = document.getElementById("modal2");
     
         if (!detailsPanel || !modal) {
             console.error("Lot details panel or modal not found!");
@@ -579,17 +503,6 @@ function initThreeJS() {
 
         modalOpen = true;
     
-        // clear previous model if exists
-        let existingModelContainer = document.getElementById("house-3d-container");
-        if (existingModelContainer) {
-            existingModelContainer.remove();
-        }
-        
-       
-        const modelContainer = document.createElement("div");
-        modelContainer.id = "house-3d-container";
-        modelContainer.style.width = "100%";
-        modelContainer.style.height = "300px"; 
     
         detailsPanel.innerHTML = `
             <h3>Lot ID: ${lot.id}</h3>
@@ -599,23 +512,41 @@ function initThreeJS() {
             <p><strong>Price:</strong> $${lot.price}</p>
             <p><strong>Block Number:</strong> ${lot.block_id}</p>
         `;
-    
-        detailsPanel.appendChild(modelContainer); // Append model container inside modal
-        modal.style.display = "flex";
-    
-        // Load and display 3D model
-        if (lot.modelUrl) {
-            init3DModel(modelContainer, lot.modelUrl);
+
+        // target the right column 
+        const rightColumn = document.querySelector(".right-column");
+        if (rightColumn) {
+            // remove previous container if it exists
+            const existing = rightColumn.querySelector("#house-3d-container");
+            if (existing) existing.remove();
+
+            // create new container for model
+            const modelContainer = document.createElement("div");
+            modelContainer.id = "house-3d-container";
+            modelContainer.style.width = "100%";
+            modelContainer.style.height = "300px";
+
+            // add to the right column
+            rightColumn.appendChild(modelContainer);
+
+            setTimeout(() => {
+                if (lot.modelUrl) {
+                    init3DModel(modelContainer, lot.modelUrl);
+                }
+            }, 0);
         }
     
-        // Close modal when clicking close
+    
+      
+     modal.style.display = "flex";
+     
         closeButton.onclick = () => {
             modal.style.display = "none";
-            stop3DModel();  // Stop 3D model animation when modal is closed
+            stop3DModel(); 
             modalOpen = false;
         };
     
-        // Close modal when clicking outside
+      
         window.onclick = (event) => {
             if (event.target === modal) {
                 modal.style.display = "none";
@@ -623,6 +554,8 @@ function initThreeJS() {
                 modalOpen = false;
             }
         };
+        renderReviewSection(lot);
+
     }
 
 
@@ -641,16 +574,20 @@ function initThreeJS() {
     var model, animationFrameId;
 
     function init3DModel(container, modelUrl) {
-        // console.log("init3dmodel called with URL:", modelUrl);
-    
         // make sure container has no laman
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
+
+         // fallback dimensions if container is invisible or collapsed
+        const width = container.offsetWidth || 300;
+        const height = container.offsetHeight || 300;
     
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
         var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        // set renderer size based on the container's actual width and height (CSS-controlled)
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         container.appendChild(renderer.domElement);
     
@@ -667,13 +604,11 @@ function initThreeJS() {
         directionalLight.position.set(5, 10, 5);
         scene.add(directionalLight);
         
-        // 3d
+        // 3D model loading
         const loader = new GLTFLoader();
         loader.load(
             modelUrl,
             (gltf) => {
-                // console.log("model loaded", modelUrl);
-    
                 model = gltf.scene;
     
                 // remove unwanted parts if model has multi meshes
@@ -688,6 +623,7 @@ function initThreeJS() {
                 model.rotation.x = Math.PI / 6;
                 model.rotation.y = Math.PI / 4;
                 camera.position.set(0, 1, 10);
+                camera.lookAt(0, 0, 0)
     
                 animate();
             },
@@ -697,15 +633,16 @@ function initThreeJS() {
             }
         );
     
-        // rotate mdl
+        // Rotate the model
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
-             if (model) {
-        model.rotation.y += 0.009;
-    }
+            if (model) {
+                model.rotation.y += 0.009;
+            }
             renderer.render(scene, camera);
         }
     }
+    
     
     function stop3DModel() {
     
@@ -759,9 +696,112 @@ function initThreeJS() {
 
 
 
-
-
-
+    function renderReviewSection(lot) {
+        const reviewSection = document.getElementById('review-section');
+        const reviews = lot.reviews ?? [];
+    
+        reviewSection.innerHTML = `
+            <h3>Leave a Review</h3>
+            <form id="review-form">
+                <label for="review-comment">Your Review:</label>
+                <textarea id="review-comment" name="comment" rows="3" required></textarea>
+    
+                <div class="star-rating">
+                    <span data-value="5">&#9733;</span>
+                    <span data-value="4">&#9733;</span>
+                    <span data-value="3">&#9733;</span>
+                    <span data-value="2">&#9733;</span>
+                    <span data-value="1">&#9733;</span>
+                </div>
+    
+                <!-- hidden input to hold the selected star rating -->
+                <input type="hidden" name="rating" id="rating-value" required>
+    
+                <button type="submit">Submit Review</button>
+            </form>
+    
+            <h3>Reviews</h3>
+            <div id="reviews-container">
+                ${reviews.map(review => `
+                    <div class="review" data-review-id="${review.id}">
+                        <strong>${review.user_name}</strong> - ${review.rating}/5<br>
+                        <p>${review.comment}</p>
+                        <small>${review.created_at}</small><br>
+    
+                        ${review.user_id === Auth.userId ? `
+                            <button class="edit-review">Edit</button>
+                            <button class="delete-review">Delete</button>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    
+        // Handle form submission and star rating
+        const reviewForm = document.getElementById('review-form');
+        const ratingInput = document.getElementById('rating-value');
+    
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent the form from submitting normally
+    
+                const comment = document.getElementById('review-comment').value;
+                const rating = ratingInput.value;
+    
+                const formData = new FormData();
+                formData.append('lot_id', reviewForm.querySelector('[name="lot_id"]').value);
+                formData.append('rating', rating);
+                formData.append('comment', comment);
+    
+                try {
+                    const response = await fetch('/reviews', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+    
+                    const data = await response.json();
+    
+                    if (response.ok) {
+                        // Handle successful review submission (e.g., add review to the page)
+                        renderReviewSection(data.lot); // Re-render the review section with updated reviews
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error submitting review:', error);
+                    alert('Something went wrong!');
+                }
+            });
+        }
+    
+        // Handle star rating click
+        document.querySelectorAll('.star-rating span').forEach(star => {
+            star.addEventListener('click', function () {
+                const rating = this.getAttribute('data-value');
+                ratingInput.value = rating;
+            });
+        });
+    
+        // Handle edit
+        document.querySelectorAll('.edit-review').forEach(button => {
+            button.addEventListener('click', function() {
+                const reviewId = this.closest('.review').getAttribute('data-review-id');
+                // Fetch the review details and show an edit form
+            });
+        });
+    
+        // Handle delete
+        document.querySelectorAll('.delete-review').forEach(button => {
+            button.addEventListener('click', function() {
+                const reviewId = this.closest('.review').getAttribute('data-review-id');
+                // Send AJAX request to delete review
+            });
+        });
+    }
+    
 
 
 

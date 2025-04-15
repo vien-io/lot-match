@@ -37,37 +37,35 @@
     <!-- threejs container -->
     <div id="threejs-container"></div>
 
-   <!-- Lot Details Modal -->
+<!-- lot details modal -->
 <div class="screen_split">
-    <!-- Left: Lot Details & Ratings -->
+    <!--container with flexbox layout -->
     <div id="lot-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>Lot Details</h2>
-            <div id="lot-details">
-                <!-- Lot details will be dynamically added here -->
+            
+            <!-- flexbox to split 2 col -->
+            <div class="modal-inner-content">
+                <!-- left column: lot details/ratings -->
+                <div class="left-column">
+                    <div id="lot-details"></div>
+                    <div class="reviews"></div>
+                    <div id="review-section"></div>
+                </div>
+
+                <!-- right column: 3d view -->
+                <div class="right-column">
+                    <div id="house-3d-container">
+                        <div id="model-container"></div>
+                        <!-- 3d  -->
+                    </div>
+                </div>
             </div>
-            <div class="reviews">
-                <!-- Display existing reviews -->
-            </div>
-            <form id="review-form">
-                <label for="rating">Rating (1-5):</label>
-                <input type="number" id="rating" name="rating" min="1" max="5" required>
-                
-                <label for="comment">Comment:</label>
-                <textarea id="comment" name="comment" rows="4" required></textarea>
-                
-                <button type="submit">Submit Review</button>
-            </form>
         </div>
     </div>
-
-    <!-- Right: 3D Viewer -->
-    <div id="house-3d-container">
-        <div id="model-container" style="background-color: #dcdcdc; width: 100%; height: 100%;"></div>
-        <!-- The 3D model will be inserted here -->
-    </div>
 </div>
+
 
 
     <div id="tooltip">

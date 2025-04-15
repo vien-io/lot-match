@@ -233,56 +233,117 @@ html, body{
     background: #fff;
     padding: 24px;
     border-radius: 12px;
-    width: 380px;
+    width: 80%;
     max-width: 90%;
-    text-align: center;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     position: relative;
     font-family: 'Inter', sans-serif;
     animation: fadeIn 0.3s ease-in-out;
 }
 
-    /* close button */
-    .close-btn {
-        position: absolute;
-        top: 12px;
-        right: 16px;
-        font-size: 20px;
-        cursor: pointer;
-        color: #333;
-        transition: color 0.2s;
-    }
+/* modal content - left column */
+.modal-inner-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 20px;
+}
 
-    .close-btn:hover {
-        color: #e74c3c;
-    }
+/* left column style */
+.left-column {
+    width: 48%;  /* Takes up half of the modal content */
+    padding-right: 20px; /* Space between columns */
+}
 
-    /* modal header */
-    .modal-content h2 {
-        font-size: 20px;
-        font-weight: 600;
-        color: #222;
-        margin-bottom: 12px;
-    }
+/* right column style */
+.right-column {
+    width: 48%;  /* Takes up the other half of the modal content */
+}
 
-    /* modal text */
-    .modal-content p {
-        font-size: 16px;
-        color: #555;
-        margin-bottom: 10px;
-    }
+/* close button */
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s;
+}
 
-    /* fade-in anim */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+.close-btn:hover {
+    color: #e74c3c;
+}
 
-    #house-3d-container {
-        width: 100%;
-        height: 400px; /* Adjust height as needed */
-        background-color: #dcdcdc; /* Gray background to see the container */
-    }
+/* modal header */
+.modal-content h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 12px;
+}
+
+/* modal text */
+.modal-content p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* fade-in anim */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 3D model container */
+#house-3d-container {
+    width: 100%; 
+    height: 400px;
+    background-color: #dcdcdc; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#model-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+#review-form {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 10px;           
+    width: 100%;           
+}
+
+
+.star-rating {
+    direction: rtl;
+    font-size: 24px;
+    unicode-bidi: bidi-override;
+    display: flex;
+    justify-content: flex-start;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.star-rating span {
+    color: #ccc;
+    transition: color 0.2s;
+}
+
+.star-rating span:hover,
+.star-rating span:hover ~ span,
+.star-rating .selected,
+.star-rating .selected ~ span {
+    color: gold;
+}
+
+
     
 
 
@@ -311,74 +372,197 @@ html, body{
 
 
 
-/* chart */
+
+
+
+
+/* general styling for the page */
+.analytics-heading {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* chart container styling */
 .chart-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    height: 400px;
+    margin-bottom: 40px;
+    width: 100%;
 }
 
 .chart-canvas {
-    width: 100% !important;
-    height: auto;
+    width: 100%;
+    height: 400px;
+    border-radius: 8px; /* rounded edges for modern look */
+    background-color: #f8f9fa; /* subtle background */
 }
 
+/* styling for the row of charts and cards */
+.row {
+    margin-bottom: 40px;
+}
 
-
-/* analytics */
-.table-container {
-    max-width: 800px;
-    margin: 0 auto;
+.col-md-6 {
     padding: 20px;
-    border-radius: 10px;
-    background-color: #fafafa;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.analytics-heading {
-    text-align: center; 
-    font-size: 24px;    
-    margin-bottom: 20px;
+/* top-rated lots card container styling */
+.top-rated-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* modern card design */
+.card {
+    background-color: #ffffff;
+    border-radius: 12px; /* rounded corners */
+    padding: 25px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* smooth shadow for depth */
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #e1e4e8; /* light border */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* subtle hover effect */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* more prominent shadow on hover */
+}
+
+.card h5 {
+    font-size: 1.3rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+/* table container for block ratings analytics */
+.table-container {
+    margin-top: 30px;
 }
 
 .analytics-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px; /* rounded table corners */
+    background-color: #fff;
 }
 
 .analytics-table th, .analytics-table td {
-    padding: 12px;
+    padding: 12px 15px;
     text-align: left;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 .analytics-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.analytics-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #f7f7f7;
+    font-weight: 600;
+    color: #333;
 }
 
 .analytics-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* recent reviews table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px; /* rounded table corners */
+}
+
+.table th, .table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #f7f7f7;
+    font-weight: 600;
+    color: #333;
+}
+
+.table tbody tr:hover {
     background-color: #f1f1f1;
 }
 
-
-#ratingDistributionChart {
-    height: 400px;
-    height: 400px !important;
+/* styling for lot availability section */
+.col-md-6 h3 {
+    font-size: 1.6rem;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 15px;
 }
 
-#topRatedLotsChart{
-    height: 400px;
-    height: 400px !important;
+.col-md-6 p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* spacing tweaks */
+.mt-4 {
+    margin-top: 40px !important;
+}
+
+/* media queries for responsive design */
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .top-rated-cards-container {
+        gap: 15px;
+    }
+
+    .analytics-heading {
+        font-size: 1.8rem;
+    }
+
+    .chart-canvas {
+        height: 300px;
+    }
 }
 
 
+.lot-availability {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border: 1px solid #ddd;
+}
 
+.lot-availability h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
 
+.lot-availability p {
+    font-size: 1.2rem;
+    color: #444;
+    margin-bottom: 15px;
+}
 
+.lot-availability p strong {
+    color: #007bff;
+    font-weight: 600;
+}

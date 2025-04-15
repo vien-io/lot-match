@@ -1,7 +1,7 @@
 import './bootstrap';
 import initThreeJS from './three';
 import '../css/homepage.css';
-import { renderBlockRatingsChart, renderRatingDistributionChart, renderTopRatedLotsChart } from './charts/blockRatingsChart';
+import { renderBlockRatingsChart, renderRatingDistributionChart, renderTopRatedLotsChart, renderTopRatedLotsCards } from './charts/blockRatingsChart';
 
 
 
@@ -159,7 +159,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBlockRatingsChart();
     renderRatingDistributionChart();
     renderTopRatedLotsChart();
+    renderTopRatedLotsCards();
 });
+
+
+
+
+
 
 
 
