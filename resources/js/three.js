@@ -491,7 +491,7 @@ function initThreeJS() {
     });
     
     function showLotDetails(lot) {
-        console.log("showLotDetails called with:", lot);
+        // console.log("showLotDetails called with:", lot);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".close-btn");
