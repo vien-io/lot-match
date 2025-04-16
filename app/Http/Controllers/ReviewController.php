@@ -15,31 +15,35 @@ class ReviewController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        // Check if the user has already submitted a review for the lot
+        // check if user has already submitted a review for the lot
         $existingReview = Review::where('user_id', Auth::id())
                                 ->where('lot_id', $request->lot_id)
                                 ->first();
 
         if ($existingReview) {
-            return response()->json([
-                'message' => 'You have already submitted a review for this lot.',
-            ], 400); // Return 400 if the user already submitted a review
-        }
-
-        // Create the new review
-        $review = Review::create([
-            'user_id' => Auth::id(),
-            'lot_id' => $request->lot_id,
+            // update existing review
+            $existingReview->update([
             'rating' => $request->rating,
             'comment' => $request->comment,
-        ]);
+            ]);
+        } else {
+            // create new review
+            $review = Review::create([
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name,
+                'lot_id' => $request->lot_id,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]);
+        }
 
-        // Fetch the updated lot with reviews
+        
+
         $lot = Lot::with('reviews.user')->find($request->lot_id);
 
         return response()->json([
             'message' => 'Review submitted successfully!',
-            'lot' => $lot, // Return the updated lot data with reviews
+            'lot' => $lot, 
         ]);
     }
 
@@ -63,12 +67,12 @@ class ReviewController extends Controller
     
         $review = Review::findOrFail($id);
     
-        // Ensure the review belongs to the authenticated user
+        // make sure review belongs to authenticated user
         if ($review->user_id != Auth::id()) {
             return response()->json(['message' => 'You can only update your own reviews.'], 403);
         }
     
-        // Update the review
+        // update review
         $review->update($request->only('rating', 'comment'));
     
         return response()->json([

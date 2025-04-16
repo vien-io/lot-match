@@ -9,7 +9,8 @@
 
     @vite(['resources/js/app.js', 'resources/css/homepage.css'])
 </head>
-<body class="threedbody">
+
+<body class="threedbody" data-user-id="{{ auth()->id() }}">
     <!-- profile dropdown -->
     <div id="profile-container">
         <button id="profile-icon">👤</button>

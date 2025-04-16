@@ -15,7 +15,8 @@ class LotController extends Controller
 
     public function show($id)
     {
-        // fetch lot details from the database using the ID
+        
+        // fetch lot details from the database using the id
         $lot = Lot::find($id);
 
         // check if lot exists
@@ -23,7 +24,7 @@ class LotController extends Controller
             return response()->json(['error' => 'Lot not found'], 404);
         }
 
-        // return lot details as a JSON response, including model URL
+        // return lot details as json response, including model url
         return response()->json([
             'id' => $lot->id,
             'name' => $lot->name,

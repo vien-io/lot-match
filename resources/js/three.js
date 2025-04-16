@@ -703,6 +703,7 @@ function initThreeJS() {
         reviewSection.innerHTML = `
             <h3>Leave a Review</h3>
             <form id="review-form">
+                <input type="hidden" name="lot_id" value="${lot.id}"> 
                 <label for="review-comment">Your Review:</label>
                 <textarea id="review-comment" name="comment" rows="3" required></textarea>
     
@@ -737,36 +738,69 @@ function initThreeJS() {
             </div>
         `;
     
-        // Handle form submission and star rating
+        // handle form submission and star rating
         const reviewForm = document.getElementById('review-form');
         const ratingInput = document.getElementById('rating-value');
+
+        // check if user is editing existing review
+        const existingReview = lot.existingReview; 
+        if (existingReview) {
+            document.getElementById('review-comment').value = existingReview.comment;
+            ratingInput.value = existingReview.rating;
+
+            // highlight selected stars for existing review
+            const stars = document.querySelectorAll('.star-rating span');
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= existingReview.rating) {
+                    star.classList.add('selected');
+                }
+            });
+        }
     
         if (reviewForm) {
             reviewForm.addEventListener('submit', async function (e) {
-                e.preventDefault(); // Prevent the form from submitting normally
+                e.preventDefault(); // prevent form from submitting normally
     
                 const comment = document.getElementById('review-comment').value;
                 const rating = ratingInput.value;
+              
+                if (!rating) {
+                    alert('Please select a star rating before submitting!');
+                    return;
+                }
     
                 const formData = new FormData();
                 formData.append('lot_id', reviewForm.querySelector('[name="lot_id"]').value);
                 formData.append('rating', rating);
                 formData.append('comment', comment);
+
+                
     
                 try {
                     const response = await fetch('/reviews', {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin'
                     });
+
+                    // if response is a redirect --> unauthenticated
+                    if (response.status === 401) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
     
                     const data = await response.json();
+
+                    console.log('Response status:', response.status);
+                    console.log('Response JSON:', data);
     
                     if (response.ok) {
-                        // Handle successful review submission (e.g., add review to the page)
-                        renderReviewSection(data.lot); // Re-render the review section with updated reviews
+                        renderReviewSection(data.lot); 
                     } else {
                         alert('Error: ' + data.message);
                     }
@@ -778,12 +812,19 @@ function initThreeJS() {
         }
     
         // Handle star rating click
-        document.querySelectorAll('.star-rating span').forEach(star => {
+        const stars = document.querySelectorAll('.star-rating span');
+        stars.forEach(star => {
             star.addEventListener('click', function () {
                 const rating = this.getAttribute('data-value');
                 ratingInput.value = rating;
+
+                // highlight stars up to the clicked one
+                stars.forEach(s => {
+                    s.classList.toggle('selected', s.getAttribute('data-value') <= rating);
+                });
             });
         });
+
     
         // Handle edit
         document.querySelectorAll('.edit-review').forEach(button => {
@@ -804,7 +845,9 @@ function initThreeJS() {
     
 
 
-
+    const userId = document.body.dataset.userId;
+    window.Auth = { userId: parseInt(userId) };
+    
 
 
 
