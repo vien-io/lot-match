@@ -472,9 +472,10 @@ function initThreeJS() {
                 fetch(`/lot/${lotId}`)
                     .then(response => response.json())
                     .then(data => {
-                        // console.log('lot data received:', data); 
+                        console.log('%c📦 Full lot data received:', 'color: #4CAF50; font-weight: bold;');
+                        console.log(data);  
                         if (data.error) {
-                            console.error(data.error);
+                            console.error('backend error:', data.error);
                         } else {
                             showLotDetails(data); // display lot details
                         }
@@ -554,6 +555,7 @@ function initThreeJS() {
                 modalOpen = false;
             }
         };
+        delete lot.existingReview;
         renderReviewSection(lot);
 
     }
@@ -835,24 +837,18 @@ function initThreeJS() {
                             const lotId = data.review.lot_id;
 
                             try {
-                                const res = await fetch(`/lots/${lotId}`);
-                                const lotData = await res.json();
-                                console.log('Fetched lot data after edit:', lotData);
+                                const res = await fetch(`/lot/${lotId}`);
+                                const updatedLot = await res.json();
+                                console.log('Fetched lot data after edit:', updatedLot);
 
-                                const lot = Array.isArray(lotData)
-                                ? lotData.find(l => l.id == lotId)
-                                : lotData; 
-                            
-
-
-
-                                if (!lot || !lot.reviews) {
-                                    console.error('Invalid lot data received after edit:', lot);
+                                
+                                if (!updatedLot || !updatedLot.reviews) {
+                                    console.error('Invalid lot data received after edit:', updatedLot);
                                     alert('Review updated but failed to refresh reviews properly.');
                                     return;
                                 }
 
-                                renderReviewSection(lot);
+                                renderReviewSection(updatedLot);
                             } catch (err) {
                                 console.error('Failed to fetch lot data after edit:', err);
                                 alert('Review updated but failed to refresh reviews.');

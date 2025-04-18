@@ -26,7 +26,7 @@ class LotController extends Controller
             return [
                 'id' => $review->id,
                 'user_id' => $review->user_id,
-                'user_name' => $review->user->name ?? 'Unknown', // fallback just in case
+                'user_name' => $review->user->name ?? 'Unknown', 
                 'rating' => $review->rating,
                 'comment' => $review->comment,
                 'created_at' => $review->created_at->toDateTimeString(),
