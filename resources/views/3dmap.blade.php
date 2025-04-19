@@ -67,6 +67,33 @@
     </div>
 </div>
 
+<!-- block details modal -->
+<div class="screen_split">
+    <div id="block-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Block Details</h2>
+
+            <div class="modal-inner-content">
+                <!-- left: block details + reviews -->
+                <div class="left-column">
+                    <div id="block-details"></div>
+                    <div class="reviews"></div>
+                    <div id="review-section"></div>
+                </div>
+
+                <!-- right: 3D model view -->
+                <div class="right-column">
+                    <div id="block-3d-container">
+                        <!-- canvas will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
     <div id="tooltip">

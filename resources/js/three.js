@@ -62,6 +62,18 @@ function initThreeJS() {
     // scene.add(lightHelper);
 
 
+
+
+
+
+
+    // house group
+    const housesGroup = new THREE.Group();
+    housesGroup.name = 'lotsGroup'; 
+    scene.add(housesGroup);
+
+   
+
     // house models
     const selectableObjects = [];
 
@@ -71,9 +83,8 @@ function initThreeJS() {
     // load the scene GLB (the one with Empty objects)
     houseLoader.load("/models/housespawn.glb", (gltf) => {
         const sceneModel = gltf.scene;
-        scene.add(sceneModel);
+        housesGroup.add(sceneModel);
 
-        // console.log("Loaded scene:", sceneModel);
 
         // find all empties
         const spawnPoints = [];
@@ -81,7 +92,7 @@ function initThreeJS() {
 
         sceneModel.traverse((child) => {
             if (child.name.startsWith("lot")) { 
-                // console.log(`Found Empty: ${child.name}, Position: ${child.position.x}, ${child.position.y}, ${child.position.z}`);
+                // console.log(`Lot detected: ${child.name}`);
                 spawnPoints.push(child.position.clone());
 
                 // extract lot id and block id from obj name
@@ -89,23 +100,29 @@ function initThreeJS() {
                 const lotId = parts[1];  
                 const blockId = parts[3]; 
 
-                // check id if ends with _r
+                // for reversed models
                 const shouldMirror = child.name.endsWith("_r");
 
                 // store rotation of spawn point
-                spawnObjects.push({ position: child.position.clone(), rotation: child.rotation.clone(), lotId, blockId, shouldMirror });
+                spawnObjects.push({ 
+                    position: child.position.clone(), 
+                    rotation: child.rotation.clone(), 
+                    lotId, 
+                    blockId, 
+                    shouldMirror 
+                });
             }
-
-
-
 
             // detect & add blocks
             if (child.name.startsWith("block_")) {
-                // console.log(`Found Block: ${child.name}`);
-                selectableObjects.push(child); // add to selectable objects
+                // console.log(`Block detected: ${child.name}`);
+                const blockId = child.name.split('_')[1];
+                child.userData.blockId = blockId;
+                // console.log(`Assigned blockId: ${blockId} to block: ${child.name}`);
+                selectableObjects.push(child);
             }
         });
-
+        // console.log('Selectable Objects:', selectableObjects);
         // console.log("Spawn points found:", spawnPoints);
 
         // load the house model and place them at the spawn points
@@ -149,7 +166,7 @@ function initThreeJS() {
 
             lod.frustumCulled = true;
 
-            scene.add(lod);
+            housesGroup.add(lod);
             selectableObjects.push(lod);
         });
     });
@@ -233,6 +250,8 @@ function initThreeJS() {
     
         if (intersects.length > 0) {
             let hoveredObject = intersects[0].object;
+            // console.log("Hovered object name:", hoveredObject.name);
+            
 
             // handle block highlightings
             if (hoveredObject.name.startsWith("block_")) {
@@ -454,15 +473,23 @@ function initThreeJS() {
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(scene.children, true);
+        const intersects = raycaster.intersectObjects(housesGroup.children, true);
+
         
+        
+
+
         if (intersects.length > 0) {
-            let selectedObject = intersects[0].object;
             
-            // traverse up to find the group if necessary
-            while (selectedObject && !selectedObject.userData.lotId && selectedObject.parent) {
+            let selectedObject = intersects[0].object;
+            console.log(selectedObject); 
+            console.log('Selected Object:', selectedObject.userData);
+            
+            // traverse up to find the group 
+            while (selectedObject && !selectedObject.userData.blockId && selectedObject.parent) {
                 selectedObject = selectedObject.parent;
             }
+            
     
             if (selectedObject.userData.lotId) {
                 const lotId = selectedObject.userData.lotId;
@@ -483,8 +510,27 @@ function initThreeJS() {
                     .catch(err => {
                         console.error('error fetching lot details:', err);
                     });
+            } else if (selectedObject.userData.blockId) {  
+                const blockId = selectedObject.userData.blockId;
+                console.log(`clicked on block with id: ${blockId}`);
+            
+                // fetch block details from backend 
+                fetch(`/block/${blockId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('%c📦 Full block data received:', 'color: #4CAF50; font-weight: bold;');
+                        console.log(data);  
+                        if (data.error) {
+                            console.error('backend error:', data.error);
+                        } else {
+                            showBlockDetails(data);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('error fetching block details:', err);
+                    });
             } else {
-                console.log("no lot id assigned to this object!");
+                console.log("clicked on empty space or non-block object!");
             }
         } else {
             console.log("clicked on empty space.");
@@ -561,6 +607,72 @@ function initThreeJS() {
     }
 
 
+
+
+
+
+
+    function showBlockDetails(block) {
+
+        const modal = document.getElementById("block-modal");
+        const closeButton = document.querySelector(".close-btn");
+    
+        if (!modal) {
+            console.error("Block modal not found!");
+            return;
+        }
+    
+        // Open modal
+        modal.style.display = "flex";
+    
+        // Target the right column for the 3D model
+        const rightColumn = document.querySelector(".right-column");
+        if (rightColumn) {
+            // Remove previous container if exists
+            const existing = rightColumn.querySelector("#block-3d-container");
+            if (existing) existing.remove();
+    
+            // Create new container for the model
+            const modelContainer = document.createElement("div");
+            modelContainer.id = "block-3d-container";
+            modelContainer.style.width = "100%";
+            modelContainer.style.height = "300px";
+    
+            // Add to the right column
+            rightColumn.appendChild(modelContainer);
+    
+            // Initialize 3D model for the block
+            setTimeout(() => {
+                if (block.modelUrl) {
+                    init3DModel(modelContainer, block.modelUrl); // pass block model URL for the 3D model
+                }
+            }, 0);
+        }
+        const blockDetails = document.getElementById('block-details');
+        if (blockDetails) {
+            blockDetails.innerHTML = `
+                <p><strong>Block Name:</strong> ${block.name ?? 'N/A'}</p>
+                <p><strong>Total Lots:</strong> ${block.lots?.length ?? 0}</p>
+                <p><strong>Description:</strong> ${block.description ?? 'No description provided.'}</p>
+            `;
+        }
+
+        // Show review section (no lot details)
+        renderReviewSection(block);
+    
+        // Close button functionality
+        closeButton.onclick = () => {
+            modal.style.display = "none";
+            stop3DModel();  // stop spinning model
+        };
+    
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                stop3DModel();
+            }
+        };
+    }
 
 
    
@@ -927,9 +1039,20 @@ function initThreeJS() {
             });
 
             if (response.ok) {
-                // Remove the deleted review from the UI 👇
+                // remove deleted review from ui
                 const reviewElement = document.querySelector(`[data-review-id="${reviewId}"]`);
                 reviewElement.remove();
+
+                // reset form fields
+                document.getElementById('review-comment').value = '';
+                document.getElementById('rating-value').value = '';
+                document.getElementById('review-id').value = '';
+                document.querySelectorAll('input[name="stars"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                // also remove edit flag if present
+                reviewForm.removeAttribute('data-editing');
             } else {
                 alert('Error deleting review');
             }

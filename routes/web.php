@@ -59,8 +59,9 @@ Route::get('/3dmap', function(){
 Route::get('/blocks', [BlockController::class, 'getBlocks']);
 Route::get('/lots/{blockId}', [LotController::class, 'getLots']);
 
-// for fetching lot details
+// for fetching lot and block details
 Route::get('/lot/{id}', [LotController::class, 'show']);
+Route::get('/block/{id}', [BlockController::class, 'show']);
 
 
 

@@ -9,8 +9,8 @@ class Block extends Model
 {
     use HasFactory;
 
-    protected $table = 'blocks'; // Table name
-    protected $fillable = ['name']; // Add other columns as needed
+    protected $table = 'blocks'; 
+    protected $fillable = ['name', 'description']; 
     
     public function lots()
     {

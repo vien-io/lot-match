@@ -10,16 +10,6 @@ class LotSeeder extends Seeder
     {  
         DB::statement('SET FOREIGN_KEY_CHECKS=0;'); 
         DB::table('lots')->truncate();  
-        DB::table('blocks')->truncate();  
-
-        // insert records to block table
-        DB::table('blocks')->insert([
-            ['id' => 1, 'name' => 'Block 1', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'name' => 'Block 2', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 3, 'name' => 'Block 3', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 4, 'name' => 'Block 4', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 5, 'name' => 'Block 5', 'created_at' => now(), 'updated_at' => now()],
-        ]);
 
         // insert records into the lots table
         DB::table('lots')->insert([
