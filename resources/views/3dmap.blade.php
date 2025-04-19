@@ -43,7 +43,7 @@
     <!--container with flexbox layout -->
     <div id="lot-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
+            <span class="close-btn lot-close">&times;</span>
             <h2>Lot Details</h2>
             
             <!-- flexbox to split 2 col -->
@@ -71,7 +71,7 @@
 <div class="screen_split">
     <div id="block-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
+            <span class="close-btn block-close">&times;</span>
             <h2>Block Details</h2>
 
             <div class="modal-inner-content">
@@ -79,7 +79,7 @@
                 <div class="left-column">
                     <div id="block-details"></div>
                     <div class="reviews"></div>
-                    <div id="review-section"></div>
+                    <div id="block-review-section"></div>
                 </div>
 
                 <!-- right: 3D model view -->

@@ -96,9 +96,11 @@ Route::get('/analytics/block-ratings', [AnalyticsController::class, 'blockRating
 // dashboard
 Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
 
+
+// reviews
 Route::middleware(['auth'])->group(function () {
-    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/block-reviews', [ReviewController::class, 'store'])->name('block.reviews.store'); 
 });
 
-Route::put('/reviews/{review}', [ReviewController::class, 'update']);
-Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
+Route::put('/block-reviews/{review}', [ReviewController::class, 'update']);
+Route::delete('/block-reviews/{review}', [ReviewController::class, 'destroy']);

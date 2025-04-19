@@ -541,12 +541,14 @@ function initThreeJS() {
         // console.log("showLotDetails called with:", lot);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
-        const closeButton = document.querySelector(".close-btn");
+        const closeButton = document.querySelector(".lot-close");
     
         if (!detailsPanel || !modal) {
             console.error("Lot details panel or modal not found!");
             return;
         }
+
+        
 
         modalOpen = true;
     
@@ -615,12 +617,13 @@ function initThreeJS() {
     function showBlockDetails(block) {
 
         const modal = document.getElementById("block-modal");
-        const closeButton = document.querySelector(".close-btn");
+        const closeButton = modal.querySelector(".block-close");
     
         if (!modal) {
             console.error("Block modal not found!");
             return;
         }
+        modalOpen = true;
     
         // Open modal
         modal.style.display = "flex";
@@ -663,13 +666,15 @@ function initThreeJS() {
         // Close button functionality
         closeButton.onclick = () => {
             modal.style.display = "none";
-            stop3DModel();  // stop spinning model
+            stop3DModel();  
+            modalOpen = false;
         };
     
         window.onclick = (event) => {
             if (event.target === modal) {
                 modal.style.display = "none";
                 stop3DModel();
+                modalOpen = false;
             }
         };
     }
@@ -808,18 +813,17 @@ function initThreeJS() {
 
 
 
+    function renderReviewSection(block) {
+        
+        const reviewSection = document.getElementById('block-review-section');
+        const reviews = block.reviews ?? [];
 
-
-    function renderReviewSection(lot) {
-        const reviewSection = document.getElementById('review-section');
-        const reviews = lot.reviews ?? [];
-    
         reviewSection.innerHTML = `
-            <h3>Leave a Review</h3>
-            <form id="review-form">
+            <h3>Leave a review</h3>
+            <form id="block-review-form">
                 <input type="hidden" name="review_id" id="review-id">
-                <input type="hidden" name="lot_id" value="${lot.id}"> 
-                <label for="review-comment">Your Review:</label>
+                <input type="hidden" name="block_id" value="${block.id}"> 
+                <label for="review-comment">your review:</label>
                 <textarea id="review-comment" name="comment" rows="3" required></textarea>
     
                 <div class="container__items rating-stars">
@@ -831,17 +835,15 @@ function initThreeJS() {
                         </div>
                         <div class="label-description" data-content="${["Excellent", "Good", "OK", "Bad", "Terrible"][5 - num]}"></div>
                     </label>
-                    `).join('')}
+                `).join('')}
                 </div>
-
     
-                <!-- hidden input to hold the selected star rating -->
                 <input type="hidden" name="rating" id="rating-value" required>
     
-                <button type="submit">Submit Review</button>
+                <button type="submit">Submit review</button>
             </form>
     
-            <h3>Reviews</h3>
+            <h3>reviews</h3>
             <div id="reviews-container">
                 ${reviews.map(review => `
                     <div class="review" data-review-id="${review.id}">
@@ -857,66 +859,60 @@ function initThreeJS() {
                 `).join('')}
             </div>
         `;
-
+    
+        // rating logic
         document.querySelectorAll('input[name="stars"]').forEach(radio => {
             radio.addEventListener('change', function () {
                 document.getElementById('rating-value').value = this.value;
             });
         });
-        
     
-        // handle form submission and star rating
-        const reviewForm = document.getElementById('review-form');
+        const reviewForm = document.getElementById('block-review-form');
         const ratingInput = document.getElementById('rating-value');
-        
-
-        // check if user is editing existing review
-        const existingReview = lot.existingReview; 
+    
+        // editing logic
+        const existingReview = block.existingReview;
         if (existingReview) {
             document.getElementById('review-comment').value = existingReview.comment;
             ratingInput.value = existingReview.rating;
-
-            // highlight selected stars for existing review
+    
             document.querySelectorAll('input[name="stars"]').forEach(radio => {
                 if (radio.value == existingReview.rating) {
-                    radio.checked = true; // Check the radio button for the existing rating
+                    radio.checked = true;
                 }
             });
         }
     
+        // submit review form handling
         if (reviewForm) {
             reviewForm.addEventListener('submit', async function (e) {
-                e.preventDefault(); // prevent form from submitting normally
+                e.preventDefault();
     
                 const comment = document.getElementById('review-comment').value;
                 const rating = ratingInput.value;
-              
+    
                 if (!rating) {
-                    alert('Please select a star rating before submitting!');
+                    alert('select a star rating before submitting!');
                     return;
                 }
     
                 const formData = new FormData();
-                formData.append('lot_id', reviewForm.querySelector('[name="lot_id"]').value);
+                formData.append('block_id', reviewForm.querySelector('[name="block_id"]').value);
                 formData.append('rating', rating);
                 formData.append('comment', comment);
-
-                
     
                 try {
-                    
                     const isEditing = reviewForm.hasAttribute('data-editing');
                     const reviewId = document.getElementById('review-id').value;
-                    let url = '/reviews';
+                    let url = '/block-reviews';
                     let method = 'POST';
-
+    
                     if (isEditing && reviewId) {
-                        url = `/reviews/${reviewId}`;
-                        method = 'POST'; // Laravel uses POST with `_method` override for PUT/PATCH
-                        formData.append('_method', 'PUT'); // Spoofing PUT for Laravel
+                        url = `/block-reviews/${reviewId}`;
+                        formData.append('_method', 'PUT');
                     }
-
-                    const response = await fetch(url, {
+    
+                    const res = await fetch(url, {
                         method: method,
                         body: formData,
                         headers: {
@@ -925,187 +921,103 @@ function initThreeJS() {
                         },
                         credentials: 'same-origin'
                     });
-                    
-
-                    // if response is a redirect --> unauthenticated
-                    if (response.status === 401) {
+    
+                    if (res.status === 401) {
                         window.location.href = '/login';
                         return;
                     }
-
     
-                    const data = await response.json();
-
-                    console.log('Response status:', response.status);
-                    console.log('Response JSON:', data);
+                    const data = await res.json();
     
-                    
-                    if (response.ok) {
-                        if (data.lot) {
-                            // submitting a new review
-                            renderReviewSection(data.lot);
+                    if (res.ok) {
+                        if (data.block) {
+                            renderReviewSection(data.block);
                         } else if (data.review) {
-                            // editing existing review — fetch updated lot data
-                            const lotId = data.review.lot_id;
-
+                            const blockId = data.review.block_id;
+    
                             try {
-                                const res = await fetch(`/lot/${lotId}`);
-                                const updatedLot = await res.json();
-                                console.log('Fetched lot data after edit:', updatedLot);
-
-                                
-                                if (!updatedLot || !updatedLot.reviews) {
-                                    console.error('Invalid lot data received after edit:', updatedLot);
-                                    alert('Review updated but failed to refresh reviews properly.');
+                                const fetchRes = await fetch(`/block/${blockId}`);
+                                const updatedBlock = await fetchRes.json();
+    
+                                if (!updatedBlock || !updatedBlock.reviews) {
+                                    alert('review updated but failed to refresh');
                                     return;
                                 }
-
-                                renderReviewSection(updatedLot);
+    
+                                renderReviewSection(updatedBlock);
                             } catch (err) {
-                                console.error('Failed to fetch lot data after edit:', err);
-                                alert('Review updated but failed to refresh reviews.');
+                                alert('review updated but failed to fetch block');
                             }
                         }
-
-                        if (reviewForm) {
-                            reviewForm.removeAttribute('data-editing');
-                        }
+    
+                        reviewForm.removeAttribute('data-editing');
                     } else {
-                        alert('Error: ' + data.message);
+                        alert('error: ' + data.message);
                     }
-                    
-                } catch (error) {
-                    console.error('Error submitting review:', error || 'Unknown error 🤔');
-                    alert('Something went wrong!');
+                } catch (err) {
+                    console.error('err submitting review:', err);
+                    alert('something went wrong');
                 }
-                
             });
         }
-
-
-
-
-
-
-  // Handle edit button click 👇
-  document.querySelectorAll('.edit-review').forEach(button => {
-    button.addEventListener('click', function() {
-        console.log('Edit button clicked'); // Log when the button is clicked
-
-        const reviewId = this.closest('.review').getAttribute('data-review-id');
-        console.log('Review ID:', reviewId); // Log the review ID
-
-        const review = lot.reviews.find(r => r.id == reviewId);
-        console.log('Review details:', review); // Log the review details
-
-        // Populate the review form with the existing review data 👇
-        document.getElementById('review-comment').value = review.comment;
-        document.getElementById('rating-value').value = review.rating;
-        document.getElementById('review-id').value = review.id;  // Set the review ID in the hidden input
-
-        // Update the stars selection 👇
-        document.querySelectorAll('input[name="stars"]').forEach(radio => {
-            if (radio.value == review.rating) {
-                radio.checked = true;
-            } 
-        });
-
-        // Optionally, update the form action or add an edit flag 👇
-        reviewForm.setAttribute('data-editing', reviewId);
-        console.log('Form is in editing mode for review:', reviewId); // Log the form mode
-    });
-});
-
-
-
-
-
- // Handle delete button click 👇
- document.querySelectorAll('.delete-review').forEach(button => {
-    button.addEventListener('click', async function() {
-        const reviewId = this.closest('.review').getAttribute('data-review-id');
-
-        const confirmed = confirm('Are you sure you want to delete this review?');
-        if (!confirmed) return;
-
-        try {
-            const response = await fetch(`/reviews/${reviewId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin'
-            });
-
-            if (response.ok) {
-                // remove deleted review from ui
-                const reviewElement = document.querySelector(`[data-review-id="${reviewId}"]`);
-                reviewElement.remove();
-
-                // reset form fields
-                document.getElementById('review-comment').value = '';
-                document.getElementById('rating-value').value = '';
-                document.getElementById('review-id').value = '';
+    
+        // edit btn
+        document.querySelectorAll('.edit-review').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const reviewId = this.closest('.review').getAttribute('data-review-id');
+                const review = block.reviews.find(r => r.id == reviewId);
+    
+                document.getElementById('review-comment').value = review.comment;
+                document.getElementById('rating-value').value = review.rating;
+                document.getElementById('review-id').value = review.id;
+    
                 document.querySelectorAll('input[name="stars"]').forEach(radio => {
-                    radio.checked = false;
+                    radio.checked = (radio.value == review.rating);
                 });
-
-                // also remove edit flag if present
-                reviewForm.removeAttribute('data-editing');
-            } else {
-                alert('Error deleting review');
-            }
-        } catch (error) {
-            console.error('Error deleting review:', error);
-            alert('Something went wrong!');
-        }
-    });
-}
- )
-
-
-
-
-
-
-
-
-        
-
-        
     
-        // Handle star rating click
-        const stars = document.querySelectorAll('.star-rating span');
-        stars.forEach(star => {
-            star.addEventListener('click', function () {
-                const rating = this.getAttribute('data-value');
-                ratingInput.value = rating;
-
-                // highlight stars up to the clicked one
-                stars.forEach(s => {
-                    s.classList.toggle('selected', s.getAttribute('data-value') <= rating);
-                });
-            });
-        });
-
-    
-        // Handle edit
-        document.querySelectorAll('.edit-review').forEach(button => {
-            button.addEventListener('click', function() {
-                const reviewId = this.closest('.review').getAttribute('data-review-id');
-                // Fetch the review details and show an edit form
+                reviewForm.setAttribute('data-editing', reviewId);
             });
         });
     
-        // Handle delete
-        document.querySelectorAll('.delete-review').forEach(button => {
-            button.addEventListener('click', function() {
+        // delete btn
+        document.querySelectorAll('.delete-review').forEach(btn => {
+            btn.addEventListener('click', async function () {
                 const reviewId = this.closest('.review').getAttribute('data-review-id');
-                // Send AJAX request to delete review
+    
+                if (!confirm('delete this review?')) return;
+    
+                try {
+                    const res = await fetch(`/block-reviews/${reviewId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin'
+                    });
+    
+                    if (res.ok) {
+                        document.querySelector(`[data-review-id="${reviewId}"]`)?.remove();
+    
+                        document.getElementById('review-comment').value = '';
+                        document.getElementById('rating-value').value = '';
+                        document.getElementById('review-id').value = '';
+                        reviewForm.removeAttribute('data-editing');
+    
+                        document.querySelectorAll('input[name="stars"]').forEach(r => r.checked = false);
+                        // also remove edit flag if present
+                        reviewForm.removeAttribute('data-editing');
+                    } else {
+                        alert('error deleting review');
+                    }
+                } catch (err) {
+                    console.error('err deleting review:', err);
+                    alert('something went wrong');
+                }
             });
         });
     }
+    
     
 
 

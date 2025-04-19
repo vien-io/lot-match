@@ -12,9 +12,16 @@ class Block extends Model
     protected $table = 'blocks'; 
     protected $fillable = ['name', 'description']; 
     
+    // Block has many lots
     public function lots()
     {
         return $this->hasMany(Lot::class, 'block_id');
+    }
+
+    // Block has many reviews
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'block_id');
     }
 }
 
