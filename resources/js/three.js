@@ -482,7 +482,6 @@ function initThreeJS() {
         if (intersects.length > 0) {
             
             let selectedObject = intersects[0].object;
-            console.log(selectedObject); 
             console.log('Selected Object:', selectedObject.userData);
             
             // traverse up to find the group 
@@ -499,8 +498,8 @@ function initThreeJS() {
                 fetch(`/lot/${lotId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('%c📦 Full lot data received:', 'color: #4CAF50; font-weight: bold;');
-                        console.log(data);  
+                        /* console.log('%c📦 Full lot data received:', 'color: #4CAF50; font-weight: bold;');
+                        console.log(data);   */
                         if (data.error) {
                             console.error('backend error:', data.error);
                         } else {
@@ -518,8 +517,8 @@ function initThreeJS() {
                 fetch(`/block/${blockId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('%c📦 Full block data received:', 'color: #4CAF50; font-weight: bold;');
-                        console.log(data);  
+                       /*  console.log('%c📦 Full block data received:', 'color: #4CAF50; font-weight: bold;');
+                        console.log(data) */;  
                         if (data.error) {
                             console.error('backend error:', data.error);
                         } else {
@@ -563,7 +562,9 @@ function initThreeJS() {
         `;
 
         // target the right column 
-        const rightColumn = document.querySelector(".right-column");
+        const rightColumn = modal.querySelector(".right-column");
+        console.log("Right column found:", rightColumn);
+
         if (rightColumn) {
             // remove previous container if it exists
             const existing = rightColumn.querySelector("#house-3d-container");
@@ -615,6 +616,13 @@ function initThreeJS() {
 
 
     function showBlockDetails(block) {
+        console.log("showBlockDetails called with:", block);
+        if (block.modelUrl) {
+            console.log("Valid modelUrl:", block.modelUrl);
+            init3DModel(modelContainer, block.modelUrl); 
+        } else {
+            console.error("No model URL provided for block", block);
+        }
 
         const modal = document.getElementById("block-modal");
         const closeButton = modal.querySelector(".block-close");
@@ -625,32 +633,28 @@ function initThreeJS() {
         }
         modalOpen = true;
     
-        // Open modal
+        // open modal
         modal.style.display = "flex";
     
-        // Target the right column for the 3D model
-        const rightColumn = document.querySelector(".right-column");
-        if (rightColumn) {
-            // Remove previous container if exists
-            const existing = rightColumn.querySelector("#block-3d-container");
-            if (existing) existing.remove();
-    
-            // Create new container for the model
-            const modelContainer = document.createElement("div");
-            modelContainer.id = "block-3d-container";
-            modelContainer.style.width = "100%";
-            modelContainer.style.height = "300px";
-    
-            // Add to the right column
-            rightColumn.appendChild(modelContainer);
-    
-            // Initialize 3D model for the block
-            setTimeout(() => {
+        setTimeout(() => {
+            const rightColumn = modal.querySelector(".right-column");
+            console.log("Right column found (delayed):", rightColumn);
+        
+            if (rightColumn) {
+                const existing = rightColumn.querySelector("#block-3d-container");
+                if (existing) existing.remove();
+        
+                const modelContainer = document.createElement("div");
+                modelContainer.id = "block-3d-container";
+                modelContainer.style.width = "100%";
+                modelContainer.style.height = "300px";
+                rightColumn.appendChild(modelContainer);
+        
                 if (block.modelUrl) {
-                    init3DModel(modelContainer, block.modelUrl); // pass block model URL for the 3D model
+                    init3DModel(modelContainer, block.modelUrl);
                 }
-            }, 0);
-        }
+            }
+        }, 50);
         const blockDetails = document.getElementById('block-details');
         if (blockDetails) {
             blockDetails.innerHTML = `
@@ -660,10 +664,10 @@ function initThreeJS() {
             `;
         }
 
-        // Show review section (no lot details)
+        // show review section
         renderReviewSection(block);
     
-        // Close button functionality
+        // close button
         closeButton.onclick = () => {
             modal.style.display = "none";
             stop3DModel();  
@@ -693,6 +697,8 @@ function initThreeJS() {
     var model, animationFrameId;
 
     function init3DModel(container, modelUrl) {
+        console.log("Initializing 3D model...");
+
         // make sure container has no laman
         while (container.firstChild) {
             container.removeChild(container.firstChild);
@@ -701,7 +707,8 @@ function initThreeJS() {
          // fallback dimensions if container is invisible or collapsed
         const width = container.offsetWidth || 300;
         const height = container.offsetHeight || 300;
-    
+        console.log("Container dimensions: ", width, height);
+
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
         var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -818,6 +825,8 @@ function initThreeJS() {
         const reviewSection = document.getElementById('block-review-section');
         const reviews = block.reviews ?? [];
 
+
+
         reviewSection.innerHTML = `
             <h3>Leave a review</h3>
             <form id="block-review-form">
@@ -859,6 +868,9 @@ function initThreeJS() {
                 `).join('')}
             </div>
         `;
+
+        
+        resetReviewForm();
     
         // rating logic
         document.querySelectorAll('input[name="stars"]').forEach(radio => {
@@ -870,18 +882,7 @@ function initThreeJS() {
         const reviewForm = document.getElementById('block-review-form');
         const ratingInput = document.getElementById('rating-value');
     
-        // editing logic
-        const existingReview = block.existingReview;
-        if (existingReview) {
-            document.getElementById('review-comment').value = existingReview.comment;
-            ratingInput.value = existingReview.rating;
-    
-            document.querySelectorAll('input[name="stars"]').forEach(radio => {
-                if (radio.value == existingReview.rating) {
-                    radio.checked = true;
-                }
-            });
-        }
+       
     
         // submit review form handling
         if (reviewForm) {
@@ -1025,7 +1026,18 @@ function initThreeJS() {
     window.Auth = { userId: parseInt(userId) };
     
 
-
+    function resetReviewForm() {
+        document.getElementById('review-comment').value = '';
+        document.getElementById('rating-value').value = '';
+        document.getElementById('review-id').value = '';
+        document.querySelectorAll('input[name="stars"]').forEach(r => r.checked = false);
+    
+        const reviewForm = document.getElementById('block-review-form');
+        if (reviewForm) {
+            reviewForm.removeAttribute('data-editing');
+        }
+    }
+    
 
 
 

@@ -346,14 +346,6 @@ html, body{
     display: block;
 }
 
-#review-form {
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    gap: 10px;           
-    width: 100%;           
-}
-
 
 
 /* rating */
@@ -380,7 +372,7 @@ html, body{
         transform: rotateY(180deg);
         display: flex;
         gap: 0.5em;
-        justify-content: center;
+        justify-content: right;
         margin: 1rem 0;
         margin-top: -0.1rem;
 
@@ -455,23 +447,67 @@ html, body{
     }
   
 
+    /* reviews */
+    
+    #review-form {
+        display: flex;
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 10px;           
+        width: 100%;           
+    }
 
-#reviews-container {
-    max-height: 200px; /* or whatever fits well */
-    overflow-y: auto;
-    padding-right: 5px;
-    scrollbar-width: thin;
-}
-
-#reviews-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-#reviews-container::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
-}
-
+    #reviews-container {
+        max-height: 300px; 
+        overflow-y: auto;  
+        padding-right: 5px;
+        scrollbar-width: thin;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .review {
+        background-color: hsl(249.09deg 22.76% 28.43%);
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 10px 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .review:not(:last-child) {
+        border-bottom: 1px solid #444;
+    }
+    
+    .review .reviewer {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #e0e0e0;
+    }
+    
+    .review .rating {
+        font-size: 0.85rem;
+        color: #f1c40f;
+    }
+    
+    .review .edit-review,
+    .review .delete-review {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .review .edit-review:hover,
+    .review .delete-review:hover {
+        background-color: #555;
+    }
+    
 
     
 
