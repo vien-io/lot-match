@@ -823,7 +823,7 @@ function initThreeJS() {
             <form id="block-review-form">
                 <input type="hidden" name="review_id" id="review-id">
                 <input type="hidden" name="block_id" value="${block.id}"> 
-                <label for="review-comment">your review:</label>
+                <label for="review-comment"></label>
                 <textarea id="review-comment" name="comment" rows="3" required></textarea>
     
                 <div class="container__items rating-stars">
@@ -843,7 +843,7 @@ function initThreeJS() {
                 <button type="submit">Submit review</button>
             </form>
     
-            <h3>reviews</h3>
+            <h3>Reviews</h3>
             <div id="reviews-container">
                 ${reviews.map(review => `
                     <div class="review" data-review-id="${review.id}">
