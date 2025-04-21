@@ -11,33 +11,38 @@ class AnalyticsController extends Controller
     {
         // block ratings
         $blockRatings = DB::table('blocks as b')
-            ->join('lots as l', 'b.id', '=', 'l.block_id')
-            ->join('reviews as r', 'l.id', '=', 'r.lot_id')
-            ->select('b.name', 
+        ->join('lots as l', 'b.id', '=', 'l.block_id')
+        ->join('reviews as r', 'l.block_id', '=', 'r.block_id')
+        ->select('b.name', 
             DB::raw('AVG(r.rating) as avg_rating'),
             DB::raw('COUNT(r.id) as total_reviews')
-            )
-            ->groupBy('b.name')
-            ->get();
+        )
+        ->groupBy('b.name')
+        ->get();
+    
 
         // top 5 highest rated
-        $topRatedLots = DB::table('lots as l')
-            ->join('reviews as r', 'l.id', '=', 'r.lot_id')
-            ->select('l.id', 'l.price', DB::raw('AVG(r.rating) as avg_rating'))
-            ->groupBy('l.id', 'l.price')
-            ->orderByDesc('avg_rating')
-            ->limit(5)
-            ->get();
+        $topRatedLots = DB::table('blocks as b')
+        ->join('reviews as r', 'b.id', '=', 'r.block_id') // Join reviews with blocks
+        ->join('lots as l', 'b.id', '=', 'l.block_id')   // Join blocks with lots
+        ->select('l.id', 'l.price', DB::raw('AVG(r.rating) as avg_rating'))
+        ->groupBy('l.id', 'l.price')  // Group by lot id and price
+        ->orderByDesc('avg_rating')   // Order by average rating descending
+        ->limit(5)                   // Limit to the top 5
+        ->get();
+
             
 
         // recent reviews
         $recentReviews = DB::table('reviews as r')
-            ->join('users as u', 'r.user_id', '=', 'u.id')
-            ->join('lots as l', 'r.lot_id', '=', 'l.id') 
-            ->select('r.user_id', 'u.name as user_name', 'r.rating', 'l.id as lot_id')
-            ->orderBy('r.created_at', 'desc')
-            ->limit(5)
-            ->get();
+        ->join('users as u', 'r.user_id', '=', 'u.id')   // Join reviews with users
+        ->join('blocks as b', 'r.block_id', '=', 'b.id')  // Join reviews with blocks
+        ->join('lots as l', 'b.id', '=', 'l.block_id')    // Join blocks with lots
+        ->select('r.user_id', 'u.name as user_name', 'r.rating', 'l.id as lot_id')
+        ->orderBy('r.created_at', 'desc')
+        ->limit(5)
+        ->get();
+    
         
         // lot available
         $availableLots = DB::table('lots')->where('status', 'available')->count();

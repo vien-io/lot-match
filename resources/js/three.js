@@ -559,36 +559,35 @@ function initThreeJS() {
             <p><strong>Block Number:</strong> ${lot.block_id}</p>
         `;
     
-        // target the right column
         const rightColumn = modal.querySelector(".right-column");
         console.log("Right column found:", rightColumn);
     
         if (rightColumn) {
-            // remove previous container if it exists
             const existing = rightColumn.querySelector("#house-3d-container");
             if (existing) existing.remove();
     
-            // create new container for model
             const modelContainer = document.createElement("div");
             modelContainer.id = "house-3d-container";
             modelContainer.style.width = "100%";
             modelContainer.style.height = "300px";
-    
-            // add to the right column
             rightColumn.appendChild(modelContainer);
+    
+            // 3D model initialization (adjust as per your new logic)
+            init3DModel(modelContainer);
         }
     
-        modal.style.display = "flex";
+        // Add the 'show' class to display the modal
+        modal.classList.add("show");
     
         closeButton.onclick = () => {
-            modal.style.display = "none";
+            modal.classList.remove("show"); // Close the modal
             stop3DModel();
             modalOpen = false;
         };
     
         window.onclick = (event) => {
             if (event.target === modal) {
-                modal.style.display = "none";
+                modal.classList.remove("show");
                 stop3DModel();
                 modalOpen = false;
             }
@@ -598,7 +597,6 @@ function initThreeJS() {
         renderReviewSection(lot);
     }
     
-
 
 
 
