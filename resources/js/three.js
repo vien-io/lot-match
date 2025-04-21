@@ -498,15 +498,11 @@ function initThreeJS() {
                 fetch(`/lot/${lotId}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Block data received:', data); 
+                        console.log('Lot data received:', data); 
                         if (data.error) {
                             console.error('backend error:', data.error);
                         } else {
-                            if (data.modelUrl) {
-                                showBlockDetails(data);
-                            } else {
-                                console.error("No modelUrl in block data", data);
-                            }
+                            showLotDetails(data);
                         }
                     })
                     .catch(err => {
@@ -572,15 +568,14 @@ function initThreeJS() {
             modelContainer.style.height = "300px";
             rightColumn.appendChild(modelContainer);
     
-            // 3D model initialization (adjust as per your new logic)
+            // 3D model initialization 
             init3DModel(modelContainer);
         }
     
-        // Add the 'show' class to display the modal
         modal.classList.add("show");
     
         closeButton.onclick = () => {
-            modal.classList.remove("show"); // Close the modal
+            modal.classList.remove("show"); 
             stop3DModel();
             modalOpen = false;
         };
