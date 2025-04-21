@@ -498,12 +498,15 @@ function initThreeJS() {
                 fetch(`/lot/${lotId}`)
                     .then(response => response.json())
                     .then(data => {
-                        /* console.log('%c📦 Full lot data received:', 'color: #4CAF50; font-weight: bold;');
-                        console.log(data);   */
+                        console.log('Block data received:', data); 
                         if (data.error) {
                             console.error('backend error:', data.error);
                         } else {
-                            showLotDetails(data); // display lot details
+                            if (data.modelUrl) {
+                                showBlockDetails(data);
+                            } else {
+                                console.error("No modelUrl in block data", data);
+                            }
                         }
                     })
                     .catch(err => {
@@ -516,9 +519,8 @@ function initThreeJS() {
                 // fetch block details from backend 
                 fetch(`/block/${blockId}`)
                     .then(response => response.json())
-                    .then(data => {
-                       /*  console.log('%c📦 Full block data received:', 'color: #4CAF50; font-weight: bold;');
-                        console.log(data) */;  
+                    .then(data => {  
+                        console.log('Block data received:', data);
                         if (data.error) {
                             console.error('backend error:', data.error);
                         } else {
@@ -537,7 +539,6 @@ function initThreeJS() {
     });
     
     function showLotDetails(lot) {
-        // console.log("showLotDetails called with:", lot);
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".lot-close");
@@ -546,11 +547,8 @@ function initThreeJS() {
             console.error("Lot details panel or modal not found!");
             return;
         }
-
-        
-
-        modalOpen = true;
     
+        modalOpen = true;
     
         detailsPanel.innerHTML = `
             <h3>Lot ID: ${lot.id}</h3>
@@ -560,43 +558,34 @@ function initThreeJS() {
             <p><strong>Price:</strong> $${lot.price}</p>
             <p><strong>Block Number:</strong> ${lot.block_id}</p>
         `;
-
-        // target the right column 
+    
+        // target the right column
         const rightColumn = modal.querySelector(".right-column");
         console.log("Right column found:", rightColumn);
-
+    
         if (rightColumn) {
             // remove previous container if it exists
             const existing = rightColumn.querySelector("#house-3d-container");
             if (existing) existing.remove();
-
+    
             // create new container for model
             const modelContainer = document.createElement("div");
             modelContainer.id = "house-3d-container";
             modelContainer.style.width = "100%";
             modelContainer.style.height = "300px";
-
+    
             // add to the right column
             rightColumn.appendChild(modelContainer);
-
-            setTimeout(() => {
-                if (lot.modelUrl) {
-                    init3DModel(modelContainer, lot.modelUrl);
-                }
-            }, 0);
         }
     
+        modal.style.display = "flex";
     
-      
-     modal.style.display = "flex";
-     
         closeButton.onclick = () => {
             modal.style.display = "none";
-            stop3DModel(); 
+            stop3DModel();
             modalOpen = false;
         };
     
-      
         window.onclick = (event) => {
             if (event.target === modal) {
                 modal.style.display = "none";
@@ -604,10 +593,11 @@ function initThreeJS() {
                 modalOpen = false;
             }
         };
+    
         delete lot.existingReview;
         renderReviewSection(lot);
-
     }
+    
 
 
 
@@ -617,13 +607,8 @@ function initThreeJS() {
 
     function showBlockDetails(block) {
         console.log("showBlockDetails called with:", block);
-        if (block.modelUrl) {
-            console.log("Valid modelUrl:", block.modelUrl);
-            init3DModel(modelContainer, block.modelUrl); 
-        } else {
-            console.error("No model URL provided for block", block);
-        }
-
+        console.log("Block modelUrl:", block.modelUrl);
+        
         const modal = document.getElementById("block-modal");
         const closeButton = modal.querySelector(".block-close");
     
@@ -639,22 +624,26 @@ function initThreeJS() {
         setTimeout(() => {
             const rightColumn = modal.querySelector(".right-column");
             console.log("Right column found (delayed):", rightColumn);
-        
+    
             if (rightColumn) {
                 const existing = rightColumn.querySelector("#block-3d-container");
                 if (existing) existing.remove();
-        
+    
                 const modelContainer = document.createElement("div");
                 modelContainer.id = "block-3d-container";
                 modelContainer.style.width = "100%";
                 modelContainer.style.height = "300px";
                 rightColumn.appendChild(modelContainer);
-        
+    
                 if (block.modelUrl) {
-                    init3DModel(modelContainer, block.modelUrl);
+                    console.log("Valid modelUrl:", block.modelUrl);
+                    init3DModel(modelContainer, block.modelUrl); 
+                } else {
+                    console.error("No model URL provided for block", block);
                 }
             }
         }, 50);
+    
         const blockDetails = document.getElementById('block-details');
         if (blockDetails) {
             blockDetails.innerHTML = `
@@ -663,7 +652,7 @@ function initThreeJS() {
                 <p><strong>Description:</strong> ${block.description ?? 'No description provided.'}</p>
             `;
         }
-
+    
         // show review section
         renderReviewSection(block);
     
@@ -682,11 +671,9 @@ function initThreeJS() {
             }
         };
     }
-
-
+    
    
     
-
 
 
 
@@ -698,46 +685,47 @@ function initThreeJS() {
 
     function init3DModel(container, modelUrl) {
         console.log("Initializing 3D model...");
-
-        // make sure container has no laman
+    
+        // clear container
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-
-         // fallback dimensions if container is invisible or collapsed
-        const width = container.offsetWidth || 300;
-        const height = container.offsetHeight || 300;
-        console.log("Container dimensions: ", width, height);
-
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-        var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
-        // set renderer size based on the container's actual width and height (CSS-controlled)
-        renderer.setSize(container.offsetWidth, container.offsetHeight);
+    
+        // get accurate container dimensions
+        const width = container.clientWidth || 300;
+        const height = container.clientHeight || 300;
+        console.log("Container dimensions:", width, height);
+    
+        // scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        camera.position.set(0, 1, 10);
+        camera.lookAt(0, 0, 0);
+    
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
         container.appendChild(renderer.domElement);
     
-        // set globally
-        window.scene = scene;     
-        window.camera = camera;  
-        window.renderer = renderer;  
+        // save globally if needed
+        window.scene = scene;
+        window.camera = camera;
+        window.renderer = renderer;
     
-        // light
-        const light = new THREE.AmbientLight(0xffffff, 1);
-        scene.add(light);
+        // lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(ambientLight);
     
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(5, 10, 5);
         scene.add(directionalLight);
-        
-        // 3D model loading
+    
+        // load model
         const loader = new GLTFLoader();
         loader.load(
             modelUrl,
             (gltf) => {
                 model = gltf.scene;
     
-                // remove unwanted parts if model has multi meshes
                 model.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
@@ -748,8 +736,6 @@ function initThreeJS() {
                 scene.add(model);
                 model.rotation.x = Math.PI / 6;
                 model.rotation.y = Math.PI / 4;
-                camera.position.set(0, 1, 10);
-                camera.lookAt(0, 0, 0)
     
                 animate();
             },
@@ -759,7 +745,7 @@ function initThreeJS() {
             }
         );
     
-        // Rotate the model
+        // animation loop
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
             if (model) {
@@ -768,6 +754,7 @@ function initThreeJS() {
             renderer.render(scene, camera);
         }
     }
+    
     
     
     function stop3DModel() {
@@ -849,7 +836,7 @@ function initThreeJS() {
     
                 <input type="hidden" name="rating" id="rating-value" required>
     
-                <button type="submit">Submit review</button>
+                <button class="review-submit-btn" type="submit">Submit review</button>
             </form>
     
             <h3>Reviews</h3>
