@@ -37,9 +37,11 @@
     "homepage": "https://github.com/vien-io/lot-match#readme",
     "dependencies": {
         "bootstrap": "^5.3.3",
+        "chart.js": "^4.4.9",
         "dat.gui": "^0.7.9",
         "express": "^4.21.2",
         "gsap": "^3.12.7",
+        "stats.js": "^0.17.0",
         "three": "^0.172.0"
     }
 }

@@ -38,29 +38,27 @@
     <!-- threejs container -->
     <div id="threejs-container"></div>
 
-<!-- lot details modal -->
-<div class="screen_split">
-    <!--container with flexbox layout -->
-    <div id="lot-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn lot-close">&times;</span>
-            <h2>Lot Details</h2>
-            
-            <!-- flexbox to split 2 col -->
-            <div class="modal-inner-content">
-                <!-- left column: lot details/ratings -->
-                <div class="left-column">
-                    <div id="lot-details"></div>
-                    <div class="reviews"></div>
-                    <div id="review-section"></div>
-                </div>
 
-                <!-- right column: 3d view -->
-                <div class="right-column">
-                    <div id="house-3d-container">
-                        <div id="model-container"></div>
-                        <!-- 3d  -->
-                    </div>
+<!--container with flexbox layout -->
+<div id="lot-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn lot-close">&times;</span>
+        <h2>Lot Details</h2>
+        
+        <!-- flexbox to split 2 col -->
+        <div class="modal-inner-content">
+            <!-- left column: lot details/ratings -->
+            <div class="left-column">
+                <div id="lot-details"></div>
+                <div class="reviews"></div>
+                <div id="review-section"></div>
+            </div>
+
+            <!-- right column: 3d view -->
+            <div class="right-column">
+                <div id="house-3d-container">
+                    <div id="model-container"></div>
+                    <!-- 3d  -->
                 </div>
             </div>
         </div>
@@ -68,25 +66,26 @@
 </div>
 
 <!-- block details modal -->
-<div class="screen_split">
-    <div id="block-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn block-close">&times;</span>
+<div id="block-modal" class="modal">
+    <div class="modal-content">
+        <div class="topTab">
             <h2>Block Details</h2>
+            <span class="close-btn block-close">&times;</span>
+        </div>
+        <div class="modal-inner-content">   
+            <!-- left: block details + reviews -->
+            <div class="left-column">
+                <div id="block-details"></div>
+            </div>
+            <div class="mid-column">
+                <div id="block-review-section"></div>
+                <div class="reviews"></div>
+            </div>
 
-            <div class="modal-inner-content">
-                <!-- left: block details + reviews -->
-                <div class="left-column">
-                    <div id="block-details"></div>
-                    <div class="reviews"></div>
-                    <div id="block-review-section"></div>
-                </div>
-
-                <!-- right: 3D model view -->
-                <div class="right-column">
-                    <div id="block-3d-container">
-                        <!-- canvas will be injected here -->
-                    </div>
+            <!-- right: 3D model view -->
+            <div class="right-column">
+                <div id="block-3d-container">
+                    <!-- canvas will be injected here -->
                 </div>
             </div>
         </div>

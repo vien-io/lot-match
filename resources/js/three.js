@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
-
+import Stats from 'stats.js';
 
 // gsap for cam animation
 import gsap from "gsap";
+
 
 
 function initThreeJS() {
@@ -35,7 +36,31 @@ function initThreeJS() {
     document.body.appendChild(renderer.domElement);
     // renderer.shadowMap.enabled = false; // pang alis ng shadows to optimize
 
+   /*  
     
+   // stats
+    const stats = new Stats();
+    stats.showPanel(0); 
+    document.body.appendChild(stats.dom);
+    stats.dom.style.position = 'fixed';
+    stats.dom.style.bottom = '10px';
+    stats.dom.style.right = '10px';
+    stats.dom.style.zIndex = '10000';
+    stats.dom.style.opacity = '0.9';
+    stats.dom.style.transform = 'scale(1.5)';
+    stats.dom.style.transformOrigin = 'bottom right';
+
+
+    // cycle panels
+    stats.dom.addEventListener('click', () => {
+        stats.showPanel((stats.currentPanel + 1) % 3);
+    });
+
+ */
+
+
+
+
 
     // controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -168,7 +193,8 @@ function initThreeJS() {
 
             housesGroup.add(lod);
             selectableObjects.push(lod);
-        });
+            
+        }); 
     });
 
     
@@ -535,6 +561,8 @@ function initThreeJS() {
     });
     
     function showLotDetails(lot) {
+        console.log("Lot data received:", lot);
+
         const detailsPanel = document.getElementById("lot-details");
         const modal = document.getElementById("lot-modal");
         const closeButton = document.querySelector(".lot-close");
@@ -559,17 +587,11 @@ function initThreeJS() {
         console.log("Right column found:", rightColumn);
     
         if (rightColumn) {
+            console.log("LOT: Right column found:", rightColumn);
             const existing = rightColumn.querySelector("#house-3d-container");
             if (existing) existing.remove();
     
-            const modelContainer = document.createElement("div");
-            modelContainer.id = "house-3d-container";
-            modelContainer.style.width = "100%";
-            modelContainer.style.height = "300px";
-            rightColumn.appendChild(modelContainer);
-    
-            // 3D model initialization 
-            init3DModel(modelContainer);
+          
         }
     
         modal.classList.add("show");
@@ -1029,11 +1051,14 @@ function initThreeJS() {
 
     // animation loop
     function animate() {
-        requestAnimationFrame(animate);
+        // stats.begin();
+       
         renderer.render(scene, camera);
 
         controls.update();
         // composer.render();
+        // stats.end();
+        requestAnimationFrame(animate);
     }
     animate();
 
