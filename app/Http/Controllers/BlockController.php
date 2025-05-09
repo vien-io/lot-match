@@ -59,5 +59,8 @@ class BlockController extends Controller
             'existingReview' => $existingReview,
         ]);
     }
-    
+    public function showForecast(Block $block)
+    {
+        return view('block-forecast', ['block' => $block]);
+    }
 }

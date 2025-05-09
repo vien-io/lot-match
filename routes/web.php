@@ -12,10 +12,12 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BlockController;
+use App\Http\Controllers\ForecastController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 
 
 
@@ -104,3 +106,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::put('/block-reviews/{review}', [ReviewController::class, 'update']);
 Route::delete('/block-reviews/{review}', [ReviewController::class, 'destroy']);
+
+
+// forecasting
+Route::get('/blocks/{block}/forecast', [BlockController::class, 'showForecast']);
+Route::get('/forecast/block/{block}', [ForecastController::class, 'getBlockRatingTrends']);

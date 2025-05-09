@@ -135,7 +135,7 @@ class LotSeeder extends Seeder
             ],
         ]);
         $this->call([
-            UpdateLotsWithModelUrlSeeder::class,
+            UpdateBlocksWithModelUrlSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');  
