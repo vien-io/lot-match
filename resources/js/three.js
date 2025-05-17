@@ -588,6 +588,7 @@ function initThreeJS() {
     
         if (rightColumn) {
             console.log("LOT: Right column found:", rightColumn);
+
             const existing = rightColumn.querySelector("#house-3d-container");
             if (existing) existing.remove();
     
@@ -637,24 +638,24 @@ function initThreeJS() {
         modal.style.display = "flex";
     
         setTimeout(() => {
-            const rightColumn = modal.querySelector(".right-column");
-            console.log("Right column found (delayed):", rightColumn);
-    
-            if (rightColumn) {
-                const existing = rightColumn.querySelector("#block-3d-container");
-                if (existing) existing.remove();
-    
-                const modelContainer = document.createElement("div");
-                modelContainer.id = "block-3d-container";
-                modelContainer.style.width = "100%";
-                modelContainer.style.height = "300px";
-                rightColumn.appendChild(modelContainer);
-    
-                if (block.modelUrl) {
-                    console.log("Valid modelUrl:", block.modelUrl);
-                    init3DModel(modelContainer, block.modelUrl); 
+            const midColumn = modal.querySelector(".mid-column");
+            console.log("Mid column found (delayed):", midColumn);
+
+            if (midColumn) {
+                const modelContainer = midColumn.querySelector("#block-3d-container");
+
+                if (modelContainer) {
+                    modelContainer.innerHTML = ""; 
+                    modelContainer.style.width = "100%";
+                    modelContainer.style.height = "300px";
+
+                    if (block.modelUrl) {
+                        init3DModel(modelContainer, block.modelUrl);
+                    } else {
+                        console.error("No model URL provided for block", block);
+                    }
                 } else {
-                    console.error("No model URL provided for block", block);
+                    console.error("block-3d-container not found inside midColumn");
                 }
             }
         }, 50);

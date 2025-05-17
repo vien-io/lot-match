@@ -73,20 +73,31 @@
             <span class="close-btn block-close">&times;</span>
         </div>
         <div class="modal-inner-content">   
-            <!-- left: block details + reviews -->
-            <div class="left-column">
-                <div id="block-details"></div>
+            <!-- left: block details + 3d + forecasting -->
+            <div class="left-outer-column">
+                <div class="top-row">
+                    <div class="left-column">
+                        <div id="block-details"></div>
+                    </div>
+                    <div class="mid-column">
+                    <div id="block-3d-container">
+                            <!-- canvas will be injected here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-row">
+                    <h3>Forecasting Data</h3>
+                    <div id="forecasting-data">
+                    <!-- forecasting data -->
+                    </div>
+                </div>
             </div>
-            <div class="mid-column">
+            
+
+            <!-- right: reviews -->
+            <div class="right-column">
                 <div id="block-review-section"></div>
                 <div class="reviews"></div>
-            </div>
-
-            <!-- right: 3D model view -->
-            <div class="right-column">
-                <div id="block-3d-container">
-                    <!-- canvas will be injected here -->
-                </div>
             </div>
         </div>
     </div>

@@ -109,5 +109,4 @@ Route::delete('/block-reviews/{review}', [ReviewController::class, 'destroy']);
 
 
 // forecasting
-Route::get('/blocks/{block}/forecast', [BlockController::class, 'showForecast']);
-Route::get('/forecast/block/{block}', [ForecastController::class, 'getBlockRatingTrends']);
+Route::get('/forecast/block/{block_id}', [ForecastController::class, 'forecastBlockRating']);

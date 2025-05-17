@@ -2,28 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Block;
 
 class ForecastController extends Controller
 {
-    public function getBlockRatingTrends(Block $block)
+    public function forecastBlockRating($block_id, $alpha = 0.3)
     {
+        // fetch ratings for block ordered by created_at
         $ratings = DB::table('reviews')
-            ->selectRaw("block_id, DATE_FORMAT(created_at, '%Y-%m') as rating_month, AVG(rating) as avg_rating")
-            ->where('block_id', $block->id)
-            ->groupBy('block_id', 'rating_month')
-            ->orderBy('block_id')
-            ->orderBy('rating_month')
-            ->get()
-            ;
+            ->where('block_id', $block_id)
+            ->orderBy('created_at', 'asc')
+            ->pluck('rating')
+            ->toArray();
 
-            return response()->json($ratings);
-    }
-    public function showForecast(Block $block)
-    {
-        return view('block-forecast', ['block' => $block]);
-    }
+        if (empty($ratings)) {
+            return response()->json([
+                'block_id' => $block_id,
+                'forecasted_rating' => null,
+                'message' => 'No ratings found for this block.'
+            ]);
+        }
 
+        // calculate EMA
+        $ema = $ratings[0];
+        for ($i = 1; $i < count($ratings); $i++) {
+            $ema = $alpha * $ratings[$i] + (1 - $alpha) * $ema;
+        }
+        $forecastedRating = round($ema, 2);
+
+        return response()->json([
+            'block_id' => $block_id,
+            'forecasted_rating' => $forecastedRating
+        ]);
+    }
 }
