@@ -76,14 +76,15 @@
             <!-- left: block details + 3d + forecasting -->
             <div class="left-outer-column">
                 <div class="top-row">
-                    <div class="left-column">
-                        <div id="block-details"></div>
-                    </div>
-                    <div class="mid-column">
-                    <div id="block-3d-container">
+                     <div class="mid-column">
+                        <div id="block-3d-container">
                             <!-- canvas will be injected here -->
                         </div>
                     </div>
+                    <div class="left-column">
+                        <div id="block-details"></div>
+                    </div>
+                   
                 </div>
                 <div class="bottom-row">
                     <h3>Forecasting Data</h3>
