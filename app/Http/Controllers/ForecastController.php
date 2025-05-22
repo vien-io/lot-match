@@ -8,31 +8,32 @@ class ForecastController extends Controller
 {
     public function forecastBlockRating($block_id, $alpha = 0.3)
     {
-        // fetch ratings for block ordered by created_at
-        $ratings = DB::table('reviews')
+        $ratingsQuery = DB::table('reviews')
             ->where('block_id', $block_id)
             ->orderBy('created_at', 'asc')
-            ->pluck('rating')
-            ->toArray();
+            ->select('rating', 'created_at')
+            ->get();
 
-        if (empty($ratings)) {
+        if ($ratingsQuery->isEmpty()) {
             return response()->json([
                 'block_id' => $block_id,
                 'forecasted_rating' => null,
+                'ratings' => [],
                 'message' => 'No ratings found for this block.'
             ]);
         }
 
-        // calculate EMA
+        $ratings = $ratingsQuery->pluck('rating')->toArray();
+
         $ema = $ratings[0];
         for ($i = 1; $i < count($ratings); $i++) {
             $ema = $alpha * $ratings[$i] + (1 - $alpha) * $ema;
         }
-        $forecastedRating = round($ema, 2);
 
         return response()->json([
             'block_id' => $block_id,
-            'forecasted_rating' => $forecastedRating
+            'forecasted_rating' => round($ema, 2),
+            'ratings' => $ratingsQuery
         ]);
     }
 }

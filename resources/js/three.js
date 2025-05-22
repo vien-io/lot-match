@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 import Stats from 'stats.js';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
+import 'chartjs-adapter-date-fns';
+
 
 // gsap for cam animation
 import gsap from "gsap";
@@ -547,6 +551,7 @@ function initThreeJS() {
                             console.error('backend error:', data.error);
                         } else {
                             showBlockDetails(data);
+                            fetchForecast(blockId);
                         }
                     })
                     .catch(err => {
@@ -559,6 +564,139 @@ function initThreeJS() {
             console.log("clicked on empty space.");
         }
     });
+
+
+
+
+
+
+
+
+
+
+let forecastChart = null;
+
+function fetchForecast(blockId) {
+    fetch(`/forecast/block/${blockId}`)
+        .then(response => response.json())
+        .then(data => {
+            const forecastDiv = document.getElementById('forecasting-data');
+
+            if (data.forecasted_rating !== null) {
+                forecastDiv.innerHTML = `
+                    <p><strong>Forecasted Rating:</strong> <span id="forecast-value">${data.forecasted_rating}</span></p>
+                    <canvas id="forecastChart" width="400" height="200"></canvas>
+                `;
+
+                const ratings = data.ratings.map(r => ({
+                    x: new Date(r.created_at),
+                    y: r.rating
+                }));
+
+                const lastDate = new Date(ratings[ratings.length - 1].x);
+                const nextDate = new Date(lastDate);
+                nextDate.setDate(lastDate.getDate() + 30);
+                ratings.push({
+                    x: nextDate,
+                    y: data.forecasted_rating
+                });
+                console.log('Forecasted point:', ratings[ratings.length - 1]);
+
+
+                if (forecastChart && typeof forecastChart.destroy === 'function') {
+                    forecastChart.destroy();
+                }
+
+                const ctx = document.getElementById('forecastChart').getContext('2d');
+                // split actual and 
+                
+                const actualRatings = ratings.slice(0, -1); // all except last
+                const forecastPoint = ratings[ratings.length - 1]; // only last
+
+                forecastChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Rating Trend + Forecast',
+                                data: ratings, // includes forecast at the end
+                                parsing: {
+                                    xAxisKey: 'x',
+                                    yAxisKey: 'y'
+                                },
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'transparent',
+                                tension: 0.3,
+                                pointBackgroundColor: (ctx) => {
+                                    const index = ctx.dataIndex;
+                                    return index === ratings.length - 1
+                                        ? 'rgba(255, 99, 132, 1)' // red forecast point
+                                        : 'rgba(75, 192, 192, 1)'; // blue actual points
+                                },
+                                pointRadius: (ctx) => {
+                                    const index = ctx.dataIndex;
+                                    return index === ratings.length - 1 ? 6 : 4;
+                                }
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'month'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                suggestedMin: 1,
+                                suggestedMax: 5,
+                                title: {
+                                    display: true,
+                                    text: 'Rating'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+
+
+            } else {
+                forecastDiv.innerHTML = `<p>No forecast available for this block.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching forecast:', error);
+            document.getElementById('forecasting-data').innerHTML = `<p>Error loading forecast.</p>`;
+        });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     function showLotDetails(lot) {
         console.log("Lot data received:", lot);
@@ -628,7 +766,7 @@ function initThreeJS() {
         const modal = document.getElementById("block-modal");
         const closeButton = modal.querySelector(".block-close");
     
-        if (!modal) {
+        if (!modal) {  
             console.error("Block modal not found!");
             return;
         }
@@ -647,7 +785,7 @@ function initThreeJS() {
                 if (modelContainer) {
                     modelContainer.innerHTML = ""; 
                     modelContainer.style.width = "100%";
-                    modelContainer.style.height = "300px";
+                    modelContainer.style.height = "150px";
 
                     if (block.modelUrl) {
                         init3DModel(modelContainer, block.modelUrl);
@@ -836,7 +974,7 @@ function initThreeJS() {
                 <input type="hidden" name="review_id" id="review-id">
                 <input type="hidden" name="block_id" value="${block.id}"> 
                 <label for="review-comment"></label>
-                <textarea id="review-comment" name="comment" rows="3" required></textarea>
+                <textarea id="review-comment" name="comment" rows="3" required placeholder="Type your review here"></textarea>
     
                 <div class="container__items rating-stars">
                 ${[5,4,3,2,1].map(num => `
@@ -870,7 +1008,7 @@ function initThreeJS() {
                     </div>
                 `).join('')}
             </div>
-        `;
+        `; 
 
         
         resetReviewForm();
@@ -936,6 +1074,8 @@ function initThreeJS() {
                     if (res.ok) {
                         if (data.block) {
                             renderReviewSection(data.block);
+                            fetchForecast(data.block.id); 
+
                         } else if (data.review) {
                             const blockId = data.review.block_id;
     
@@ -949,6 +1089,7 @@ function initThreeJS() {
                                 }
     
                                 renderReviewSection(updatedBlock);
+                                fetchForecast(data.block.id); 
                             } catch (err) {
                                 alert('review updated but failed to fetch block');
                             }

@@ -89,7 +89,8 @@
                 <div class="bottom-row">
                     <h3>Forecasting Data</h3>
                     <div id="forecasting-data">
-                    <!-- forecasting data -->
+                        <p><strong>Forecasted Rating:</strong> <span id="forecast-value"></span></p>
+                        <canvas id="forecastChart" width="400" height="200"></canvas>
                     </div>
                 </div>
             </div>
