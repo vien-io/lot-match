@@ -12,9 +12,12 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BlockController;
+use App\Http\Controllers\ForecastController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 
 
 
@@ -58,8 +61,9 @@ Route::get('/3dmap', function(){
 Route::get('/blocks', [BlockController::class, 'getBlocks']);
 Route::get('/lots/{blockId}', [LotController::class, 'getLots']);
 
-// for fetching lot details
+// for fetching lot and block details
 Route::get('/lot/{id}', [LotController::class, 'show']);
+Route::get('/block/{id}', [BlockController::class, 'show']);
 
 
 
@@ -90,3 +94,21 @@ Route::post('/signup', [RegisterController::class, 'register'])->name('signup');
 
 // analytics
 Route::get('/analytics/block-ratings', [AnalyticsController::class, 'blockRatings'])->name('analytics.block_ratings');
+
+// dashboard
+Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
+
+
+// reviews
+Route::middleware(['auth'])->group(function () {
+    Route::post('/block-reviews', [ReviewController::class, 'store'])->name('block.reviews.store'); 
+});
+
+Route::put('/block-reviews/{review}', [ReviewController::class, 'update']);
+Route::delete('/block-reviews/{review}', [ReviewController::class, 'destroy']);
+
+
+// forecasting
+Route::get('/forecast/block/{block_id}', [ForecastController::class, 'forecastBlockRating']);
+
+Route::get('/forecast/history/{block_id}', [ForecastController::class, 'forecastWithHistory']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lot;
+use Illuminate\Support\Facades\Auth;
 
 class LotController extends Controller
 {
@@ -14,24 +15,40 @@ class LotController extends Controller
     }
 
     public function show($id)
-    {
-        // fetch lot details from the database using the ID
-        $lot = Lot::find($id);
+{
+    $lot = Lot::with('reviews.user')->find($id);
 
-        // check if lot exists
-        if (!$lot) {
-            return response()->json(['error' => 'Lot not found'], 404);
-        }
-
-        // return lot details as a JSON response, including model URL
-        return response()->json([
-            'id' => $lot->id,
-            'name' => $lot->name,
-            'description' => $lot->description,
-            'size' => $lot->size,
-            'price' => $lot->price,
-            'block_id' => $lot->block_id,
-            'modelUrl' => $lot->model_url ? asset('models/' . $lot->model_url) : null, 
-        ]);
+    if (!$lot) {
+        return response()->json(['error' => 'Lot not found'], 404);
     }
+
+    $reviews = $lot->reviews->map(function ($review) {
+        return [
+            'id' => $review->id,
+            'user_id' => $review->user_id,
+            'user_name' => $review->user->name ?? 'Unknown', 
+            'rating' => $review->rating,
+            'comment' => $review->comment,
+            'created_at' => $review->created_at->toDateTimeString(),
+        ];
+    });
+
+    $existingReview = null;
+    if (Auth::check()) {
+        $existingReview = $reviews->firstWhere('user_id', Auth::id());
+    }
+
+    return response()->json([
+        'id' => $lot->id,
+        'name' => $lot->name,
+        'description' => $lot->description,
+        'size' => $lot->size,
+        'price' => $lot->price,
+        'block_id' => $lot->block_id,
+        'reviews' => $reviews,
+        'existingReview' => $existingReview, 
+    ]);
+}
+
+
 }

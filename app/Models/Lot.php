@@ -19,4 +19,9 @@ class Lot extends Model
     {
         return $this->belongsTo(Block::class, 'block_id');
     }
+
+    public function reviews() {
+        return $this->hasMany(Review::class, 'block_id', 'block_id');
+    }
+    
 }

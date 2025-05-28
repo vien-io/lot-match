@@ -6,10 +6,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>3D Map - LotMatch</title>
-
+    <script>
+       /*  const isAdmin = @json(auth()->check() && auth()->user()->is_admin);
+        console.log(isAdmin); */
+    </script>
     @vite(['resources/js/app.js', 'resources/css/homepage.css'])
 </head>
-<body class="threedbody">
+
+<body class="threedbody" 
+    data-user-id="{{ auth()->id() }}"
+    data-is-admin="{{ auth()->check() && auth()->user()->is_admin }}">
     <!-- profile dropdown -->
     <div id="profile-container">
         <button id="profile-icon">👤</button>
@@ -37,37 +43,76 @@
     <!-- threejs container -->
     <div id="threejs-container"></div>
 
-   <!-- Lot Details Modal -->
-<div class="screen_split">
-    <!-- Left: Lot Details & Ratings -->
-    <div id="lot-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>Lot Details</h2>
-            <div id="lot-details">
-                <!-- Lot details will be dynamically added here -->
+
+<!--container with flexbox layout -->
+<div id="lot-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn lot-close">&times;</span>
+        <h2>Lot Details</h2>
+        
+        <!-- flexbox to split 2 col -->
+        <div class="modal-inner-content">
+            <!-- left column: lot details/ratings -->
+            <div class="left-column">
+                <div id="lot-details"></div>
+                <div class="reviews"></div>
+                <div id="review-section"></div>
             </div>
-            <div class="reviews">
-                <!-- Display existing reviews -->
+
+            <!-- right column: 3d view -->
+            <div class="right-column">
+                <div id="house-3d-container">
+                    <div id="model-container"></div>
+                    <!-- 3d  -->
+                </div>
             </div>
-            <form id="review-form">
-                <label for="rating">Rating (1-5):</label>
-                <input type="number" id="rating" name="rating" min="1" max="5" required>
-                
-                <label for="comment">Comment:</label>
-                <textarea id="comment" name="comment" rows="4" required></textarea>
-                
-                <button type="submit">Submit Review</button>
-            </form>
         </div>
     </div>
+</div>
 
-    <!-- Right: 3D Viewer -->
-    <div id="house-3d-container">
-        <div id="model-container" style="background-color: #dcdcdc; width: 100%; height: 100%;"></div>
-        <!-- The 3D model will be inserted here -->
+<!-- block details modal -->
+<div id="block-modal" class="modal">
+    <div class="modal-content">
+        <div class="topTab">
+            <h2>Block Details</h2>
+            <span class="close-btn block-close">&times;</span>
+        </div>
+        <div class="modal-inner-content">   
+            <!-- left: block details + 3d + forecasting -->
+            <div class="left-outer-column">
+                <div class="top-row">
+                     <div class="mid-column">
+                        <div id="block-3d-container">
+                            <!-- canvas will be injected here -->
+                        </div>
+                    </div>
+                    <div class="left-column">
+                        <div id="block-details"></div>
+                    </div>
+                   
+                </div>
+                <div class="bottom-row">
+                    <h3>Forecasting Data</h3>
+                    @if (auth()->check() && auth()->user()->is_admin)
+                    <div id="forecasting-data">
+                        <p><strong>Forecasted Rating:</strong> <span  id="forecast-value"></span></p>
+                        <canvas id="forecastChart" width="400" height="200"></canvas>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            
+
+            <!-- right: reviews -->
+            <div class="right-column">
+                <div id="block-review-section"></div>
+                <div class="reviews"></div>
+            </div>
+        </div>
     </div>
 </div>
+
+
 
 
     <div id="tooltip">
