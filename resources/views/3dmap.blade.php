@@ -6,11 +6,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>3D Map - LotMatch</title>
-
+    <script>
+       /*  const isAdmin = @json(auth()->check() && auth()->user()->is_admin);
+        console.log(isAdmin); */
+    </script>
     @vite(['resources/js/app.js', 'resources/css/homepage.css'])
 </head>
 
-<body class="threedbody" data-user-id="{{ auth()->id() }}">
+<body class="threedbody" 
+    data-user-id="{{ auth()->id() }}"
+    data-is-admin="{{ auth()->check() && auth()->user()->is_admin }}">
     <!-- profile dropdown -->
     <div id="profile-container">
         <button id="profile-icon">👤</button>
@@ -88,10 +93,12 @@
                 </div>
                 <div class="bottom-row">
                     <h3>Forecasting Data</h3>
+                    @if (auth()->check() && auth()->user()->is_admin)
                     <div id="forecasting-data">
-                        <p><strong>Forecasted Rating:</strong> <span id="forecast-value"></span></p>
+                        <p><strong>Forecasted Rating:</strong> <span  id="forecast-value"></span></p>
                         <canvas id="forecastChart" width="400" height="200"></canvas>
                     </div>
+                    @endif
                 </div>
             </div>
             

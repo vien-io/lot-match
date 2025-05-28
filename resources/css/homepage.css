@@ -578,35 +578,33 @@ textarea:hover {
     }
 
     #reviews-container {
-        max-height: 200px; 
-        overflow-y: auto;
-        padding-right: 5px;
-        scrollbar-width: thin;
-        /* display: flex; */
-        /* flex-direction: column; */
-        border: 1px solid red;
-        gap: 10px;
-    }   
+    max-height: 200px; 
+    overflow-y: auto;
+    padding-right: 5px;
+    gap: 10px;
+}
 
-    #reviews-container::-webkit-scrollbar {
+#reviews-container::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-    }
+}
 
-    #reviews-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
+#reviews-container::-webkit-scrollbar-track {
+    background: hsla(220, 25%, 10%, 0.8); 
     border-radius: 10px;
-    }
+}
 
-    #reviews-container::-webkit-scrollbar-thumb {
-    background: hsl(220, 50%, 70%);
+#reviews-container::-webkit-scrollbar-thumb {
+    background: hsl(220, 30%, 20%); 
     border-radius: 10px;
-    border: 2px solid #fff;
-    }
+    border: 2px solid #888888;
+}
 
-    #reviews-container::-webkit-scrollbar-thumb:hover {
-    background: hsl(220, 50%, 50%);
-    }
+#reviews-container::-webkit-scrollbar-thumb:hover {
+    background: hsl(221, 61%, 68%);
+    border: 2px solid #ffffff;
+}
+
 
 
     

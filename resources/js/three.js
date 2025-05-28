@@ -572,11 +572,20 @@ function initThreeJS() {
 
 
 
-
+ 
 
 let forecastChart = null;
 
 function fetchForecast(blockId) {
+    const isAdmin = document.body.getAttribute('data-is-admin') === '1';
+
+    if (!isAdmin) {
+        console.log("User is not an admin");
+        return;
+    }
+
+    console.log("User is an admin");
+        
     fetch(`/forecast/block/${blockId}`)
         .then(response => response.json())
         .then(data => {
