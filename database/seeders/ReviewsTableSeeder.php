@@ -10,145 +10,55 @@ class ReviewsTableSeeder extends Seeder
 {
     public function run()
     {
+        // Disable foreign key checks to safely truncate the table
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('reviews')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
+        $blocks = [1, 2, 3]; // Example block IDs, adjust as needed
+        $sentiments = ['positive', 'neutral', 'negative'];
+        $comments = [
+            'Great place, loved it!',
+            'It was okay, nothing special.',
+            'Had a bad experience here.',
+            'Amazing atmosphere and service.',
+            'Could be better.',
+            'Not recommended.',
+            'Will visit again!',
+            'Average experience.',
+            'Terrible customer support.',
+            'Highly recommended for families.'
+        ];
+
         $now = Carbon::now();
 
-        $reviews = [
-            [
-                'id' => 1,
-                'block_id' => 1,
-                'rating' => 4,
-                'user_name' => 'Clyde',
-                'user_id' => 1,
-                'comment' => 'Quiet and peaceful, perfect for a family home.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 2,
-                'block_id' => 1,
-                'rating' => 3,
-                'user_name' => 'Bob',
-                'user_id' => 2,
-                'comment' => 'Good location but some drainage issues during rainy season.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 3,
-                'block_id' => 2,
-                'rating' => 5,
-                'user_name' => 'Charlie',
-                'user_id' => 3,
-                'comment' => 'Absolutely love the community and vibe here!',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 4,
-                'block_id' => 1,
-                'rating' => 4,
-                'user_name' => 'Dana',
-                'user_id' => 4,
-                'comment' => 'Well-maintained area and friendly neighbors.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 5,
-                'block_id' => 2,
-                'rating' => 3,
-                'user_name' => 'Eli',
-                'user_id' => 5,
-                'comment' => 'Some noise from nearby construction, but overall okay.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 6,
-                'block_id' => 1,
-                'rating' => 4,
-                'user_name' => 'Faye',
-                'user_id' => 6,
-                'comment' => 'Fantastic layout and very secure environment.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 7,
-                'block_id' => 2,
-                'rating' => 2,
-                'user_name' => 'George',
-                'user_id' => 7,
-                'comment' => 'Needs better lighting at night and more green spaces.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 8,
-                'block_id' => 1,
-                'rating' => 3,
-                'user_name' => 'Hannah',
-                'user_id' => 8,
-                'comment' => 'Decent place, but the roads could use repairs.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 9,
-                'block_id' => 2,
-                'rating' => 4,
-                'user_name' => 'Ivan',
-                'user_id' => 9,
-                'comment' => 'Good value for the price and accessible location.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 10,
-                'block_id' => 1,
-                'rating' => 2,
-                'user_name' => 'Jane',
-                'user_id' => 10,
-                'comment' => 'Had high hopes but experienced water supply issues.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 11,
-                'block_id' => 2,
-                'rating' => 5,
-                'user_name' => 'Ken',
-                'user_id' => 11,
-                'comment' => 'Perfect for retirees like me—calm and relaxing.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'id' => 12,
-                'block_id' => 1,
-                'rating' => 3,
-                'user_name' => 'Lina',
-                'user_id' => 12,
-                'comment' => 'Nice design overall, but amenities are still incomplete.',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-        ];
-        
-        foreach ($reviews as $review) {
-            // prevent duplicate review insertion for same user and block
-            $exists = DB::table('reviews')
-                ->where('block_id', $review['block_id'])
-                ->where('user_id', $review['user_id'])
-                ->exists();
+        for ($i = 1; $i <= 100; $i++) { // Generate 100 reviews
+            $blockId = $blocks[array_rand($blocks)];
+            $sentiment = $sentiments[array_rand($sentiments)];
 
-            if (!$exists) {
-                DB::table('reviews')->insert($review);
+            // Assign rating based on sentiment roughly
+            switch ($sentiment) {
+                case 'positive':
+                    $rating = rand(4, 5);
+                    break;
+                case 'neutral':
+                    $rating = rand(2, 3);
+                    break;
+                case 'negative':
+                    $rating = rand(1, 2);
+                    break;
             }
+
+            DB::table('reviews')->insert([
+                'user_id' => rand(1, 50), // Assuming you have 50 users
+                'block_id' => $blockId,
+                'rating' => $rating,
+                'user_name' => 'User' . rand(1, 50),
+                'created_at' => $now->copy()->subDays(rand(0, 365)), // random date within the past year
+                'updated_at' => $now,
+                'comment' => $comments[array_rand($comments)],
+                'sentiment' => $sentiment,
+            ]);
         }
     }
 }
