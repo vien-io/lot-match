@@ -5,6 +5,7 @@ import Stats from 'stats.js';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 import 'chartjs-adapter-date-fns';
+import { loadBlockSummary } from './blockSummary';
 
 
 // gsap for cam animation
@@ -818,6 +819,13 @@ function fetchForecast(blockId) {
     
         // show review section
         renderReviewSection(block);
+
+        // load the summary
+        loadBlockSummary(block.id);
+
+
+
+
     
         // close button
         closeButton.onclick = () => {
@@ -907,11 +915,12 @@ function fetchForecast(blockId) {
                 console.error("Error loading model:", error);
             }
         );
-    
+        
         // animation loop
+        let isAnimating = false;
         function animate() {
             animationFrameId = requestAnimationFrame(animate);
-            if (model) {
+            if (model && isAnimating) {
                 model.rotation.y += 0.009;
             }
             renderer.render(scene, camera);

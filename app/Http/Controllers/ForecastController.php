@@ -125,7 +125,7 @@ class ForecastController extends Controller
 
         $latestMonth = array_key_last($sentiments);
         $latestSentiment = $sentiments[$latestMonth] ?? ['positive' => 0, 'neutral' => 0, 'negative' => 0];
-
+ 
         $total = array_sum($latestSentiment) ?: 1;
         $positivePct = round(($latestSentiment['positive'] ?? 0) / $total * 100);
         $neutralPct = round(($latestSentiment['neutral'] ?? 0) / $total * 100);
@@ -135,9 +135,17 @@ class ForecastController extends Controller
             return response()->json(['summary' => 'Rating forecast unavailable.'], 200);
         }
 
-        $summary = "Forecast for Block $blockId: ";
-        $summary .= "Average rating is expected to be around " . number_format($forecastedRating, 1) . ". ";
-        $summary .= "Recent sentiment: $positivePct% positive, $neutralPct% neutral, $negativePct% negative.";
+        $summary = "Block $blockId looks ";
+
+        if ($forecastedRating >= 4) {
+            $summary .= "great for living, with a forecasted rating of " . number_format($forecastedRating, 1) . ". ";
+        } elseif ($forecastedRating >= 3) {
+            $summary .= "decent, with a forecasted rating of " . number_format($forecastedRating, 1) . ". ";
+        } else {
+            $summary .= "concerning, with a forecasted rating of " . number_format($forecastedRating, 1) . ". ";
+        }
+
+        $summary .= "Recent sentiment from residents: $positivePct% positive, $neutralPct% neutral, $negativePct$ negative.";
 
         return response()->json(['summary' => $summary]);
     }   

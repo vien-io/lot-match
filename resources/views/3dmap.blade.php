@@ -93,6 +93,7 @@
                 </div>
                 <div class="bottom-row">
                     <h3>Forecasting Data</h3>
+                    <div id="block-summary"></div>
                     @if (auth()->check() && auth()->user()->is_admin)
                     <div id="forecasting-data">
                         <p><strong>Forecasted Rating:</strong> <span  id="forecast-value"></span></p>
@@ -101,7 +102,6 @@
                     @endif
                 </div>
             </div>
-            
 
             <!-- right: reviews -->
             <div class="right-column">
